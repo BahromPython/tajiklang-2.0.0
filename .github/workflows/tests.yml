@@ -1,0 +1,84 @@
+name: Санҷишҳо
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Тестҳо (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Тестҳоро иҷро кардан
+        run: python -m unittest discover -s tests -t . -v
+
+      - name: Ҳар мисолро иҷро кардан
+        run: |
+          set -e
+          for file in examples/*.tj; do
+            case "$file" in
+              *хато*|*асбоб*) continue ;;
+            esac
+            echo "--- $file"
+            printf 'Баҳром\n16\n' | python main.py "$file" > /dev/null
+          done
+
+      - name: Ҳар мисол аз санҷанда тоза мебарояд
+        run: |
+          set -e
+          for file in examples/*.tj; do
+            case "$file" in
+              *хато*) continue ;;
+            esac
+            python main.py --санҷиш "$file" > /dev/null
+          done
+
+      - name: Барномаҳои хатогидор бояд хато диҳанд
+        run: |
+          set -e
+          for file in examples/хато*.tj; do
+            if python main.py "$file" > /dev/null 2>&1; then
+              echo "$file бояд хато медод"; exit 1
+            fi
+          done
+
+  artifacts:
+    name: Майдонча ва васеъкунӣ аз нав сохта мешаванд
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Аз нав сохтан
+        run: |
+          python tools/build_playground.py
+          python tools/collect_messages.py
+          python tools/build_vsix.py
+
+      - name: Файлҳои сохташуда бояд тоза бошанд
+        run: |
+          if [ -n "$(git status --porcelain playground docs/ТАРҶУМА.md)" ]; then
+            echo "Файлҳои сохташуда кӯҳна шудаанд — аз нав созед ва фиристед:"
+            git --no-pager diff --stat playground docs/ТАРҶУМА.md
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tajiklang-vsix
+          path: dist/*.vsix

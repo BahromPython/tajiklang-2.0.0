@@ -19,8 +19,14 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Homepage = "https://bahrompython.github.io/tajiklang/"
+Source = "https://github.com/BahromPython/tajiklang"
+Documentation = "https://github.com/BahromPython/tajiklang/blob/main/docs/дарсҳо.md"
+
 [project.scripts]
 tajik = "tajiklang.cli:main"
+tajik-ide = "tajiklang.ide:main"
 
 [tool.setuptools]
 packages = ["tajiklang"]

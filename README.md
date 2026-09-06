@@ -1,5 +1,10 @@
 # TajikLang
 
+[![Санҷишҳо](https://github.com/BahromPython/tajiklang/actions/workflows/tests.yml/badge.svg)](https://github.com/BahromPython/tajiklang/actions/workflows/tests.yml)
+[![Сомона](https://img.shields.io/badge/сомона-bahrompython.github.io%2Ftajiklang-0f7b5f)](https://bahrompython.github.io/tajiklang/)
+[![Литсензия](https://img.shields.io/badge/литсензия-MIT-blue)](LICENSE)
+
+**[Санҷед дар браузер →](https://bahrompython.github.io/tajiklang/playground.html)** ·
 **[Тоҷикӣ →](README.tg.md)** · **[Дарсҳо →](docs/дарсҳо.md)**
 
 Забони барномасозӣ бо забони тоҷикӣ — a beginner-friendly programming language
@@ -41,6 +46,18 @@ holds. 420 tests.
         навис(д["ном"], "— аъло")
     вагарна:
         навис(д["ном"], "—", риёзӣ.гирд(миёна * 100) / 100)
+```
+
+## Насб / Install
+
+```bash
+pip install git+https://github.com/BahromPython/tajiklang.git
+```
+
+```bash
+tajik барнома.tj      # run a file
+tajik                 # interactive shell
+tajik-ide             # the editor
 ```
 
 ## Бе насб / Without installing anything
@@ -103,13 +120,28 @@ tajik --tokens examples/шарт.tj
 tajik --ast examples/шарт.tj
 ```
 
-## VS Code
-
-Copy the extension folder into VS Code's extensions directory and restart:
+## Муҳаррир / The editor
 
 ```bash
-cp -r editors/vscode "$USERPROFILE/.vscode/extensions/tajiklang.tajiklang-1.0.0"
+py -m tajiklang.ide
 ```
+
+A small IDE built on tkinter, which ships with Python — so a school computer
+needs nothing installed beyond Python itself. File list, Tajik syntax
+colouring, line numbers, an input pane for `хонед`, **F5** to run and **F6**
+to check. The problems panel lists everything the checker is sure of *before*
+the program runs; click a problem to jump to its line.
+
+## VS Code
+
+```bash
+py tools/build_vsix.py
+code --install-extension dist/tajiklang-2.0.0.vsix
+```
+
+`tools/build_vsix.py` packages the extension using only the standard library —
+no `npm`, no `vsce`, no network — because "install Node first" is a poor answer
+for a school in Dushanbe.
 
 You get syntax highlighting for `.tj`, 4-space indentation enforced by the
 editor (the language rejects tabs, so this matters), and reserved-but-unimplemented
@@ -171,7 +203,10 @@ Source code (.tj, UTF-8)
 | `tajiklang/errors.py` | Tajik error messages with line, caret and hint |
 | `tajiklang/cli.py` | the `tajik` command and the interactive shell |
 | `tools/build_playground.py` | builds `playground/index.html` — regenerate, do not hand-edit |
+| `tajiklang/ide.py` | the tkinter editor — checking, colouring, running |
 | `tools/collect_messages.py` | builds `docs/ТАРҶУМА.md`, the translation review sheet |
+| `tools/build_vsix.py` | packages the VS Code extension without npm |
+| `tools/build_site.py` | builds `site/` for GitHub Pages |
 | `editors/vscode/` | syntax highlighting extension |
 | `LANGUAGE_SPEC.md` | the language contract — read this before changing syntax |
 
@@ -317,6 +352,17 @@ author does not.
 
 Everything planned is built. What is left is not code: a Tajik teacher
 reading `docs/ТАРҶУМА.md`, and students using it.
+
+## Ҳисса гузоштан / Contributing
+
+The most valuable contribution needs no code: if you read Tajik, open
+[`docs/ТАРҶУМА.md`](docs/ТАРҶУМА.md) — every message the language can show a
+student, with a column for a better wording. Twenty minutes of a teacher's
+time is worth more to this project than any feature.
+
+For code: `python -m unittest discover -s tests -t .` must stay green, and
+generated files (`playground/`, `docs/ТАРҶУМА.md`) are rebuilt by their tools
+rather than edited — CI checks that they match.
 
 Not planned: a bytecode VM. Tree-walking is slow and it will not matter —
 no student program is performance-bound.
