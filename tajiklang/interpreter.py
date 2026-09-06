@@ -590,13 +590,25 @@ class Interpreter:
         name = statement.name
         path = self.base_dir / (name + ".tj")
 
+        # A file beside the program wins; after that, an installed package.
+        # That order means a student can always override a library by putting
+        # their own file next to the program, which is easier to explain than
+        # any search-path rule.
+        if not path.exists():
+            from . import packages
+
+            found = packages.resolve(name)
+            if found is not None:
+                path = found
+
         if not path.exists():
             available = ", ".join(sorted(stdlib.BUILTIN_MODULES))
             raise self._error(
                 statement,
                 f'Модули "{name}" ёфт нашуд.',
                 hint=f"На модули дарунсохт ({available}), на файли "
-                f'"{name}.tj" дар ин ҷузвдон.',
+                f'"{name}.tj" дар ин ҷузвдон, на бастаи насбшуда. '
+                f"Барои насб: tajik гирифтан {name}",
             )
 
         key = str(path.resolve())

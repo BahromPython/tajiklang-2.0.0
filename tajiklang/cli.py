@@ -29,6 +29,13 @@ USAGE = """TajikLang {version}
     tajik --tokens <файл.tj>   токенҳоро нишон медиҳад
     tajik --ast <файл.tj>      дарахти синтаксисиро нишон медиҳад
     tajik --version            версияро нишон медиҳад
+
+Бастаҳо:
+    tajik муҳаррир             муҳаррирро мекушояд
+    tajik ҷустуҷӯ              бастаҳои мавҷударо нишон медиҳад
+    tajik гирифтан <ном>       бастаро насб мекунад
+    tajik бастаҳо              бастаҳои насбшударо нишон медиҳад
+    tajik нест <ном>           бастаро нест мекунад
 """
 
 BANNER = """TajikLang {version} — реҷаи интерактивӣ
@@ -178,9 +185,80 @@ def repl() -> int:
     return 0
 
 
+def packages_command(args: list[str]) -> int:
+    """The `tajik` subcommands that manage packages, all in Tajik."""
+    from . import packages
+
+    command, rest = args[0], args[1:]
+
+    try:
+        if command == "ҷустуҷӯ":
+            found = packages.catalogue()
+            if not found:
+                print("Феҳрист холӣ аст.")
+                return 0
+            have = packages.installed()
+            print("Бастаҳои мавҷуда:")
+            for name, entry in sorted(found.items()):
+                mark = "✓" if name in have else " "
+                print(f"  {mark} {name:<12} {entry.get('нусха', '?'):<8} "
+                      f"{entry.get('тавсиф', '')}")
+            print()
+            print("Барои насб: tajik гирифтан <ном>")
+            return 0
+
+        if command == "бастаҳо":
+            have = packages.installed()
+            if not have:
+                print("Ҳеҷ баста насб нашудааст.")
+                print("Барои дидани бастаҳои мавҷуда: tajik ҷустуҷӯ")
+                return 0
+            print(f"Насбшуда ({packages.library()}):")
+            for name, meta in sorted(have.items()):
+                print(f"  {name:<12} {meta.get('нусха', '?'):<8} "
+                      f"{meta.get('тавсиф', '')}")
+            return 0
+
+        if command == "гирифтан":
+            if not rest:
+                print("Номи баста лозим аст: tajik гирифтан <ном>", file=sys.stderr)
+                return EX_USAGE
+            for name in rest:
+                meta = packages.install(name)
+                print(f"✓ {name} {meta['нусха']} насб шуд "
+                      f"({meta['файлҳо']} файл)")
+                print(f"  Истифода: ворид {name}")
+            return 0
+
+        if command == "нест":
+            if not rest:
+                print("Номи баста лозим аст: tajik нест <ном>", file=sys.stderr)
+                return EX_USAGE
+            for name in rest:
+                packages.remove(name)
+                print(f"✓ {name} нест шуд")
+            return 0
+
+    except packages.PackageError as error:
+        print(error.message, file=sys.stderr)
+        if error.hint:
+            print(f"Маслиҳат: {error.hint}", file=sys.stderr)
+        return EX_DATAERR
+
+    return EX_USAGE
+
+
 def main(argv: list[str] | None = None) -> int:
     _force_utf8_streams()
     args = list(sys.argv[1:] if argv is None else argv)
+
+    if args and args[0] in ("муҳаррир", "ide"):
+        from .ide import main as ide_main
+
+        return ide_main(args[1:])
+
+    if args and args[0] in ("ҷустуҷӯ", "гирифтан", "бастаҳо", "нест"):
+        return packages_command(args)
 
     if args and args[0] in ("--version", "-v"):
         print(f"TajikLang {__version__}")
