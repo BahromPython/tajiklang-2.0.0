@@ -13,7 +13,7 @@
 
 [![Санҷишҳо](https://github.com/BahromPython/tajiklang/actions/workflows/tests.yml/badge.svg)](https://github.com/BahromPython/tajiklang/actions/workflows/tests.yml)
 [![Сомона](https://github.com/BahromPython/tajiklang/actions/workflows/pages.yml/badge.svg)](https://bahrompython.github.io/tajiklang/)
-![Санҷишҳо](https://img.shields.io/badge/санҷишҳо-432-0f7b5f)
+![Санҷишҳо](https://img.shields.io/badge/санҷишҳо-450-0f7b5f)
 ![Python](https://img.shields.io/badge/python-3.10%20–%203.13-blue)
 [![Литсензия](https://img.shields.io/badge/литсензия-MIT-lightgrey)](LICENSE)
 
@@ -120,27 +120,35 @@ every mainstream language answers it with silence.
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<td width="33%" valign="top">
 
 ### Nothing at all
 
 [**Open the playground →**](https://bahrompython.github.io/tajiklang/playground.html)
 
-The whole language runs in one page — no Python, no install, no account.
-Best for schools.
+Runs in one page. No install, no account.
 
 </td>
-<td width="50%" valign="top">
+<td width="33%" valign="top">
+
+### Windows — no Python
+
+[**Download →**](https://github.com/BahromPython/tajiklang/releases/latest)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File насб.ps1
+```
+
+Adds `tajik` to PATH, opens `.tj` files on double-click, and puts the editor
+in the Start menu.
+
+</td>
+<td width="33%" valign="top">
 
 ### With Python
 
 ```bash
 pip install git+https://github.com/BahromPython/tajiklang.git
-```
-
-```bash
-tajik барнома.tj
-tajik
 ```
 
 </td>
@@ -150,10 +158,44 @@ tajik
 ```bash
 tajik барнома.tj        # run a file
 tajik                   # interactive shell
-tajik-ide               # the editor
+tajik муҳаррир          # the editor
 tajik --санҷиш f.tj     # check without running
 tajik --tokens f.tj     # look inside the lexer
 ```
+
+### Бастаҳо · Packages
+
+TajikLang has **its own package manager**, not pip — a student installing a
+Tajik library should not have to learn Python's tooling first, and the
+standalone build has no pip at all.
+
+```bash
+tajik ҷустуҷӯ           # what exists
+tajik гирифтан омор     # install it
+tajik бастаҳо           # what is installed
+tajik нест омор         # remove it
+```
+
+```tajik
+ворид омор
+ворид шакл
+
+бигзор баҳоҳо = [5, 4, 5, 3, 5, 4, 2]
+
+шакл.қуттӣ("Журнали синф")
+навис("Медиана:", омор.медиана(баҳоҳо))
+навис("Инҳироф:", гирд(омор.инҳироф(баҳоҳо), 2))
+шакл.диаграмма(["Душанбе", "Хуҷанд"], [95, 60])
+```
+
+A package is a folder of `.tj` files; the registry is one JSON file, read from
+GitHub when there is a network and from the bundled copy when there is not, so
+a classroom offline still gets a working `ҷустуҷӯ`. Installing only ever writes
+`.tj` files, and every path in the archive is checked first — a zip claiming
+`../../evil.tj` cannot write outside its own folder.
+
+Both starter packages — `омор` (median, mode, variance) and `шакл` (boxes,
+bar charts) — are **written in TajikLang**, not Python.
 
 ### The editor
 
@@ -276,8 +318,10 @@ Source (.tj, UTF-8)
 | `tajiklang/page.py` | `саҳифа` — building web pages |
 | `tajiklang/interop.py` | `питон` — the one door to Python's libraries |
 | `tajiklang/ide.py` | the tkinter editor |
+| `tajiklang/packages.py` | `бастаҳо` — the package manager |
 | `tajiklang/errors.py` | Tajik errors with caret, hint and call stack |
-| `tools/` | builders for the playground, site, `.vsix` and review sheet |
+| `tools/` | builders for the playground, site, `.vsix`, standalone build and review sheet |
+| `бастаҳо/` | the package registry, and two packages written in TajikLang |
 
 ```bash
 python -m unittest discover -s tests -t .
