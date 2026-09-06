@@ -7,4 +7,7 @@ dist/
 venv/
 .pytest_cache/
 *.vsix
+
+# built by tools/build_site.py, published by the Pages workflow
+site/
 .DS_Store

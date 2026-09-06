@@ -27,8 +27,9 @@ OUTPUT = ROOT / "playground" / "index.html"
 # version means a browser that worked yesterday can break tomorrow.
 PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
 
-# Modules the CLI needs but the browser does not.
-SKIP = {"cli.py", "__main__.py"}
+# Modules the browser has no use for. `ide.py` needs tkinter, which does not
+# exist in the browser, and every kilobyte here is one a student downloads.
+SKIP = {"cli.py", "__main__.py", "ide.py"}
 
 # Examples worth putting in the dropdown, in teaching order.
 EXAMPLE_ORDER = [
