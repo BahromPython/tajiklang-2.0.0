@@ -1,0 +1,109 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "TajikLang",
+  "scopeName": "source.tajiklang",
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "include": "#number"
+    },
+    {
+      "include": "#class-name"
+    },
+    {
+      "include": "#function-name"
+    },
+    {
+      "include": "#keyword"
+    },
+    {
+      "include": "#constant"
+    },
+    {
+      "include": "#builtin"
+    },
+    {
+      "include": "#operator"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "name": "comment.line.number-sign.tajiklang",
+      "match": "#.*$"
+    },
+    "string": {
+      "name": "string.quoted.double.tajiklang",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.tajiklang",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "number": {
+      "name": "constant.numeric.tajiklang",
+      "match": "(?<![\\p{L}\\p{N}_])[0-9]+(\\.[0-9]+)?(?![\\p{L}\\p{N}_])"
+    },
+    "keyword": {
+      "patterns": [
+        {
+          "name": "keyword.control.tajiklang",
+          "match": "(?<![\\p{L}\\p{N}_])(баргардон|то_вақте|вагарна|барои|шикан|давом|кӯшиш|мерос|агар|хато|аз|то)(?![\\p{L}\\p{N}_])"
+        },
+        {
+          "name": "keyword.declaration.tajiklang",
+          "match": "(?<![\\p{L}\\p{N}_])(функсия|бигзор|ворид|қолиб)(?![\\p{L}\\p{N}_])"
+        }
+      ]
+    },
+    "constant": {
+      "name": "constant.language.tajiklang",
+      "match": "(?<![\\p{L}\\p{N}_])(рост|дурӯғ|холӣ)(?![\\p{L}\\p{N}_])"
+    },
+    "builtin": {
+      "name": "support.function.builtin.tajiklang",
+      "match": "(?<![\\p{L}\\p{N}_])(тамом_мешавад|сар_мешавад|калонтарин|тартиб_бо|хурдтарин|рақам_аст|холӣ_кун|гирифтан|нест_кун|холӣ_аст|ба_рақам|тасодуфӣ|рақамҳо|баръакс|калидҳо|қиматҳо|ба_матн|интихоб|пайваст|дарозӣ|тартиб|ҷуфтҳо|дараҷа|мутлақ|такрор|ҳарфҳо|навис|хонед|илова|хориҷ|васеъ|шумор|буриш|ҷамъи|миёна|дорад|нусха|бутун|калон|ёфтан|чаро|дарҷ|ҳама|ягон|навъ|реша|гирд|фарш|сақф|макс|хурд|тоза|ҷудо|иваз|ҷои|мин)(?=\\s*\\()"
+    },
+    "function-name": {
+      "match": "(?<![\\p{L}\\p{N}_])(функсия)\\s+([^\\s(]+)",
+      "captures": {
+        "1": {
+          "name": "keyword.declaration.tajiklang"
+        },
+        "2": {
+          "name": "entity.name.function.tajiklang"
+        }
+      }
+    },
+    "operator": {
+      "patterns": [
+        {
+          "name": "keyword.operator.logical.tajiklang",
+          "match": "(?<![\\p{L}\\p{N}_])(ва|ё|не)(?![\\p{L}\\p{N}_])"
+        },
+        {
+          "name": "keyword.operator.tajiklang",
+          "match": "(\\|>|==|!=|<=|>=|\\+=|-=|\\*=|/=|%=|<|>|\\+|-|\\*|/|%|=)"
+        }
+      ]
+    },
+    "class-name": {
+      "match": "(?<![\\p{L}\\p{N}_])(қолиб)\\s+([^\\s:]+)",
+      "captures": {
+        "1": {
+          "name": "keyword.declaration.tajiklang"
+        },
+        "2": {
+          "name": "entity.name.class.tajiklang"
+        }
+      }
+    }
+  }
+}
