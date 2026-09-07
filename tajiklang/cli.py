@@ -5,6 +5,11 @@
     tajik --tokens барнома.tj show what the lexer produced
     tajik --ast барнома.tj    show what the parser produced
     tajik --version
+
+TajikWeb:
+    tajik веб нав <ном>              сомонаи нав месозад
+    tajik веб соз [папка]            HTML-и тайёр месозад
+    tajik веб омода-github [папка]   GitHub Pages-ро омода мекунад
 """
 
 from __future__ import annotations
@@ -259,6 +264,53 @@ def packages_command(args: list[str]) -> int:
     return EX_USAGE
 
 
+def web_command(args: list[str]) -> int:
+    """The small, static-first TajikWeb command line."""
+    from . import web
+
+    if not args:
+        print(USAGE.format(version=__version__))
+        return EX_USAGE
+
+    command, rest = args[0], args[1:]
+    try:
+        if command == "нав":
+            if len(rest) != 1:
+                print("Номи сомона лозим аст: tajik веб нав номи_сомона", file=sys.stderr)
+                return EX_USAGE
+            root = web.create_project(rest[0])
+            print(f"✓ Сомонаи «{root.name}» сохта шуд.")
+            print(f"  Ба он дароед: cd {root.name}")
+            print("  Баъд иҷро кунед: tajik веб соз")
+            return 0
+
+        if command == "соз":
+            if len(rest) > 1:
+                print("Истифода: tajik веб соз [папка]", file=sys.stderr)
+                return EX_USAGE
+            result = web.build_project(rest[0] if rest else None)
+            print(f"✓ Сомона сохта шуд: {result.output / 'index.html'}")
+            if result.copied_assets:
+                print(f"  {result.copied_assets} файл аз static/ нусха шуд.")
+            return 0
+
+        if command in ("омода-github", "омода_github"):
+            if len(rest) > 1:
+                print("Истифода: tajik веб омода-github [папка]", file=sys.stderr)
+                return EX_USAGE
+            workflow = web.prepare_github_pages(rest[0] if rest else None)
+            print("✓ GitHub Pages омода шуд.")
+            print(f"  Файл: {workflow}")
+            print("  Лоиҳаро ба GitHub push кунед ва дар Settings → Pages «GitHub Actions»-ро интихоб кунед.")
+            return 0
+
+        print("Фармони веб шинохта нашуд. Истифода: tajik веб нав | соз | омода-github", file=sys.stderr)
+        return EX_USAGE
+    except web.WebError as error:
+        print(error, file=sys.stderr)
+        return EX_DATAERR
+
+
 def main(argv: list[str] | None = None) -> int:
     _force_utf8_streams()
     args = list(sys.argv[1:] if argv is None else argv)
@@ -270,6 +322,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args and args[0] in ("ҷустуҷӯ", "гирифтан", "бастаҳо", "нест"):
         return packages_command(args)
+
+    if args and args[0] in ("веб", "web"):
+        return web_command(args[1:])
 
     if args and args[0] in ("--version", "-v"):
         print(f"TajikLang {__version__}")
