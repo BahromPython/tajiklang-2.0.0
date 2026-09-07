@@ -25,7 +25,6 @@ the cursor there.
 from __future__ import annotations
 
 import sys
-import traceback
 from pathlib import Path
 
 try:
@@ -36,7 +35,7 @@ except ImportError:  # pragma: no cover - headless machines
 
 from . import __version__, highlight
 from .checker import check_program
-from .errors import TajikLangError
+from .errors import TajikLangError, internal_report
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
@@ -414,8 +413,9 @@ class IDE:
             self._say("Хатои иҷро")
         except RecursionError:
             self._write("Рекурсия аз ҳад чуқур шуд.", error=True)
-        except Exception:                       # noqa: BLE001 - show, never hide
-            self._write(traceback.format_exc(), error=True)
+        except Exception as error:              # noqa: BLE001 - our bug, not theirs
+            self._write(internal_report(error, "муҳаррир"), error=True)
+            self._say("Хатои дохилӣ")
         finally:
             self.panels.select(0)
 

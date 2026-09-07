@@ -194,6 +194,7 @@ const MODULES = {modules};
 const EXAMPLES = {examples};
 const MAX_ITERATIONS = {max_iterations};
 
+const NL = String.fromCharCode(10);
 const codeEl = document.getElementById("code");
 const stdinEl = document.getElementById("stdin");
 const pageEl = document.getElementById("tajik-page");
@@ -294,6 +295,12 @@ def _run(source):
         return (_NL.join(lines + ["", error.format()]), True)
     except RecursionError:
         return (_NL.join(lines + ["", "Хатои иҷро: рекурсия аз ҳад чуқур шуд."]), True)
+    except Exception as error:
+        # A fault in the language itself. The student sees Tajik, never a
+        # traceback: they have done nothing wrong and English filenames tell
+        # them nothing they can act on.
+        from tajiklang.errors import internal_report
+        return (_NL.join(lines + ["", internal_report(error, "майдонча")]), True)
     return (_NL.join(lines), False)
 
 _run
@@ -335,8 +342,15 @@ function run() {{
         text.trim() === "" ? (drew ? "(саҳифа сохта шуд)" : "(бе натиҷа)") : text;
       outEl.className = failed ? "error" : "";
     }} catch (err) {{
-      outEl.textContent = "Хатои дохилӣ: " + err;
+      // Never show the raw error: it carries the implementation's own
+      // wording, which means nothing to a student.
+      outEl.textContent =
+        "Хатои дохилии забон." + NL + NL +
+        "Ин хатои барномаи шумо нест." + NL +
+        "Лутфан хабар диҳед: " +
+        "https://github.com/BahromPython/tajiklang/issues";
       outEl.className = "error";
+      console.error(err);
     }}
   }}, 10);
 }}

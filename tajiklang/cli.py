@@ -14,7 +14,7 @@ from pathlib import Path
 
 from . import __version__
 from .checker import check_program
-from .errors import TajikLangError
+from .errors import TajikLangError, internal_report
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
@@ -49,6 +49,7 @@ EXIT_WORDS = {"хуруҷ", "баромадан", "exit", "quit"}
 EX_USAGE = 64
 EX_DATAERR = 65
 EX_NOINPUT = 66
+EX_SOFTWARE = 70
 
 
 def _force_utf8_streams() -> None:
@@ -125,6 +126,12 @@ def run_file(path: Path, mode: str = "run") -> int:
     except TajikLangError as error:
         print(error.format(), file=sys.stderr)
         return EX_DATAERR
+    except RecursionError:
+        print("Рекурсия аз ҳад чуқур шуд.", file=sys.stderr)
+        return EX_DATAERR
+    except Exception as error:              # noqa: BLE001 - our bug, not theirs
+        print(internal_report(error, str(path)), file=sys.stderr)
+        return EX_SOFTWARE
 
 
 def opens_block(line: str) -> bool:
@@ -181,6 +188,10 @@ def repl() -> int:
             interpreter.run(program, echo=True)
         except TajikLangError as error:
             print(error.format(), file=sys.stderr)
+        except RecursionError:
+            print("Рекурсия аз ҳад чуқур шуд.", file=sys.stderr)
+        except Exception as error:          # noqa: BLE001 - our bug, not theirs
+            print(internal_report(error, "реҷаи интерактивӣ"), file=sys.stderr)
 
     return 0
 

@@ -254,7 +254,7 @@ def landing(f: dict[str, str]) -> str:
     <a class="btn" href="install.html">⬇ Насб кардан</a>
   </div>
   <p class="note">Дар браузер ҳеҷ насб лозим нест. Барои Windows нусхаи
-     мустақил ҳаст — Python лозим нест.</p>
+     мустақил ҳаст — ҳеҷ чизи дигар лозим нест.</p>
 
   <div class="stats">
     <div><b>{f['version']}</b><span>версия</span></div>
@@ -429,8 +429,8 @@ def install_page(f: dict[str, str]) -> str:
     return (
         HEAD.format(
             title="Насб кардани TajikLang",
-            description="TajikLang-ро дар браузер, дар Windows бе Python, "
-                        "ё бо Python насб кунед.",
+            description="TajikLang-ро дар браузер санҷед ё барои Windows "
+                        "боргирӣ кунед. Ҳеҷ чизи дигар лозим нест.",
             style=STYLE,
         )
         + NAV.format(repo=REPO)
@@ -452,9 +452,9 @@ def install_page(f: dict[str, str]) -> str:
 </section>
 
 <section>
-  <h2>2 · Windows — бе Python</h2>
-  <p class="sub">Нусхаи мустақил. Дар компютере кор мекунад, ки ҳеҷ гоҳ Python
-     надоштааст.</p>
+  <h2>2 · Windows</h2>
+  <p class="sub">Нусхаи мустақил барои мактаб ва хона. Ҳеҷ чизи дигар лозим
+     нест — на Python, на интернети доимӣ.</p>
 
   <div class="cta">
     <a class="btn primary" href="{DOWNLOAD}">⬇ TajikLang {f['version']} барои Windows</a>
@@ -480,11 +480,12 @@ tajik муҳаррир        муҳаррирро мекушояд</pre></li>
 </section>
 
 <section>
-  <h2>3 · Бо Python</h2>
-  <p class="sub">Агар Python 3.10 ё навтар дошта бошед.</p>
+  <h2>3 · Аз манбаъ</h2>
+  <p class="sub">Ин роҳ барои онҳоест, ки мехоҳанд худи забонро тағйир диҳанд
+     ё дар таҳияи он ҳисса гузоранд. Барои омӯзиш роҳи 1 ё 2 кофист.</p>
   <pre class="out">pip install git+{REPO}.git</pre>
-  <pre class="out">tajik барнома.tj
-tajik муҳаррир</pre>
+  <p class="quiet">Талаб мекунад: Python 3.10 ё навтар. Тафсилот дар
+     <a href="{REPO}">GitHub</a>.</p>
 </section>
 
 <section>

@@ -126,3 +126,45 @@ class BuiltinError(Exception):
         self.message = message
         self.hint = hint
         self.kind_code = kind_code
+
+
+def internal_report(error: BaseException, where: str = "") -> str:
+    """A fault in the language itself — reported in Tajik, never as a traceback.
+
+    A student who meets a crash in the interpreter has done nothing wrong, and
+    a wall of English filenames tells them nothing they can act on. So the
+    message says, in their language, that this is our bug and how to report
+    it — and the technical detail goes to a log file for whoever fixes it.
+
+    This is the only place the implementation can surface, and it does not.
+    """
+    import traceback
+
+    detail = "".join(
+        traceback.format_exception(type(error), error, error.__traceback__)
+    )
+
+    log = ""
+    try:
+        from . import packages
+
+        path = packages.home() / "хатоҳо.log"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(f"--- {where or 'иҷро'} ---{chr(10)}{detail}{chr(10)}")
+        log = str(path)
+    except Exception:       # noqa: BLE001 - logging must never be the failure
+        log = ""
+
+    lines = [
+        "Хатои дохилии забон.",
+        "",
+        "Ин хатои барномаи шумо нест — ин камбудии худи TajikLang аст.",
+    ]
+    if log:
+        lines.append(f"Тафсилот дар: {log}")
+    lines.append(
+        "Лутфан хабар диҳед: "
+        "https://github.com/BahromPython/tajiklang/issues"
+    )
+    return chr(10).join(lines)
