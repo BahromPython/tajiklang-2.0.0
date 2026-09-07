@@ -597,7 +597,7 @@ class Interpreter:
         if not path.exists():
             from . import packages
 
-            found = packages.resolve(name)
+            found = packages.resolve(name, self.base_dir)
             if found is not None:
                 path = found
 

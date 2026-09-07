@@ -71,14 +71,19 @@ def home() -> Path:
     return Path.home() / ".tajiklang"
 
 
-def library() -> Path:
+def library(project_root: Path | None = None) -> Path:
+    """The global library, or a project's own library when requested."""
+    if project_root is not None:
+        from . import environment
+
+        return project_root / environment.ENV_DIR / environment.LIBRARY
     return home() / "китобхона"
 
 
-def installed() -> dict[str, dict[str, Any]]:
+def installed(project_root: Path | None = None) -> dict[str, dict[str, Any]]:
     """Every installed package, by name."""
     found: dict[str, dict[str, Any]] = {}
-    folder = library()
+    folder = library(project_root)
     if not folder.is_dir():
         return found
 
@@ -92,8 +97,17 @@ def installed() -> dict[str, dict[str, Any]]:
     return found
 
 
-def resolve(name: str) -> Path | None:
-    """The file `ворид <name>` should load, if that package is installed."""
+def resolve(name: str, base_dir: Path | None = None) -> Path | None:
+    """Find a package: project environment first, global library second."""
+    if base_dir is not None:
+        from . import environment
+
+        project = environment.find(base_dir)
+        if project is not None:
+            candidate = library(project) / name / f"{name}.tj"
+            if candidate.is_file():
+                return candidate
+
     candidate = library() / name / f"{name}.tj"
     return candidate if candidate.is_file() else None
 
@@ -122,7 +136,9 @@ def catalogue(offline: bool = False) -> dict[str, dict[str, Any]]:
 # ---------------------------------------------------------------------------
 # installing
 # ---------------------------------------------------------------------------
-def install(name: str, offline: bool = False) -> dict[str, Any]:
+def install(
+    name: str, offline: bool = False, project_root: Path | None = None
+) -> dict[str, Any]:
     """Download a package and put its `.tj` files where `ворид` will find them."""
     entries = catalogue(offline)
     if name not in entries:
@@ -146,7 +162,7 @@ def install(name: str, offline: bool = False) -> dict[str, Any]:
             hint=f"Пайвасти интернетро санҷед. ({error})",
         ) from None
 
-    target = library() / name
+    target = library(project_root) / name
     if target.exists():
         shutil.rmtree(target)
     target.mkdir(parents=True)
@@ -211,8 +227,8 @@ def _extract(payload: bytes, target: Path, inside: str, name: str) -> int:
     return written
 
 
-def remove(name: str) -> None:
-    target = library() / name
+def remove(name: str, project_root: Path | None = None) -> None:
+    target = library(project_root) / name
     if not target.is_dir():
         raise PackageError(
             f'Бастаи "{name}" насб нашудааст.',

@@ -201,6 +201,12 @@ def main() -> int:
         # works on a machine that has never had a network
         "--add-data", f"{ROOT / 'бастаҳо' / 'феҳрист.json'}{os.pathsep}бастаҳо",
         "--hidden-import", "tkinter",
+        # CLI subcommands import these only when the student asks for them;
+        # name them here so the no-Python Windows application has every
+        # feature that the source version has.
+        "--hidden-import", "tajiklang.web",
+        "--hidden-import", "tajiklang.blocks",
+        "--hidden-import", "tajiklang.environment",
         # main.py, not tajiklang/__main__.py: PyInstaller runs the entry as a
         # top-level script, where `from .cli import main` has no parent
         # package to be relative to.

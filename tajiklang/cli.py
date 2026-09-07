@@ -10,6 +10,13 @@ TajikWeb:
     tajik веб нав <ном>              сомонаи нав месозад
     tajik веб соз [папка]            HTML-и тайёр месозад
     tajik веб омода-github [папка]   GitHub Pages-ро омода мекунад
+
+Муҳит ва TajikBlocks:
+    tajik лоиҳа нав <ном>            лоиҳа бо муҳити худаш месозад
+    tajik муҳит соз [папка]          ба папка муҳити маҳаллӣ медиҳад
+    tajik гирифтан --лоиҳа <ном>     бастаро фақат дар ҳамин лоиҳа мегирад
+    tajik блокҳо                     муҳаррири визуалии TajikBlocks-ро мекушояд
+    tajik пешнамоиш [папка]          сомонаро дар localhost мекушояд
 """
 
 from __future__ import annotations
@@ -41,6 +48,20 @@ USAGE = """TajikLang {version}
     tajik гирифтан <ном>       бастаро насб мекунад
     tajik бастаҳо              бастаҳои насбшударо нишон медиҳад
     tajik нест <ном>           бастаро нест мекунад
+    tajik гирифтан --лоиҳа <ном> бастаро фақат дар ҳамин лоиҳа мегирад
+
+Муҳит:
+    tajik лоиҳа нав <ном>      лоиҳа бо муҳити худаш месозад
+    tajik муҳит соз [папка]    ба папка муҳити маҳаллӣ медиҳад
+
+TajikBlocks ва localhost:
+    tajik блокҳо               муҳаррири визуалиро мекушояд
+    tajik пешнамоиш [папка]    сомонаро дар localhost мекушояд
+
+TajikWeb:
+    tajik веб нав <ном>        сомонаи нав месозад
+    tajik веб соз [папка]      HTML-и тайёр месозад
+    tajik веб омода-github     GitHub Pages-ро омода мекунад
 """
 
 BANNER = """TajikLang {version} — реҷаи интерактивӣ
@@ -213,7 +234,7 @@ def packages_command(args: list[str]) -> int:
             if not found:
                 print("Феҳрист холӣ аст.")
                 return 0
-            have = packages.installed()
+            have = packages.installed(project_root)
             print("Бастаҳои мавҷуда:")
             for name, entry in sorted(found.items()):
                 mark = "✓" if name in have else " "
@@ -224,12 +245,12 @@ def packages_command(args: list[str]) -> int:
             return 0
 
         if command == "бастаҳо":
-            have = packages.installed()
+            have = packages.installed(project_root)
             if not have:
                 print("Ҳеҷ баста насб нашудааст.")
                 print("Барои дидани бастаҳои мавҷуда: tajik ҷустуҷӯ")
                 return 0
-            print(f"Насбшуда ({packages.library()}):")
+            print(f"Насбшуда ({packages.library(project_root)}):")
             for name, meta in sorted(have.items()):
                 print(f"  {name:<12} {meta.get('нусха', '?'):<8} "
                       f"{meta.get('тавсиф', '')}")
@@ -240,7 +261,7 @@ def packages_command(args: list[str]) -> int:
                 print("Номи баста лозим аст: tajik гирифтан <ном>", file=sys.stderr)
                 return EX_USAGE
             for name in rest:
-                meta = packages.install(name)
+                meta = packages.install(name, project_root=project_root)
                 print(f"✓ {name} {meta['нусха']} насб шуд "
                       f"({meta['файлҳо']} файл)")
                 print(f"  Истифода: ворид {name}")
@@ -251,7 +272,7 @@ def packages_command(args: list[str]) -> int:
                 print("Номи баста лозим аст: tajik нест <ном>", file=sys.stderr)
                 return EX_USAGE
             for name in rest:
-                packages.remove(name)
+                packages.remove(name, project_root=project_root)
                 print(f"✓ {name} нест шуд")
             return 0
 
@@ -262,6 +283,75 @@ def packages_command(args: list[str]) -> int:
         return EX_DATAERR
 
     return EX_USAGE
+
+
+def environment_command(args: list[str]) -> int:
+    """Create a TajikLang project or give an existing folder a local library."""
+    from . import environment
+
+    if not args:
+        print(USAGE.format(version=__version__))
+        return EX_USAGE
+    command, rest = args[0], args[1:]
+    project_root = None
+    if "--лоиҳа" in rest:
+        rest.remove("--лоиҳа")
+        from . import environment
+
+        project_root = environment.find(Path.cwd())
+        if project_root is None:
+            print("Муҳити лоиҳа ёфт нашуд. Аввал: tajik муҳит соз", file=sys.stderr)
+            return EX_DATAERR
+    try:
+        if command == "нав" and len(rest) == 1:
+            project = environment.create_project(rest[0])
+            print(f"✓ Лоиҳаи «{project.name}» бо муҳити худ сохта шуд.")
+            print(f"  Барнома: {project / environment.MAIN_FILE}")
+            print("  Барои бастаи танҳо ҳамин лоиҳа: tajik гирифтан --лоиҳа омор")
+            return 0
+        if command == "соз" and len(rest) <= 1:
+            folder = Path(rest[0]) if rest else Path.cwd()
+            made = environment.create_environment(folder)
+            print(f"✓ Муҳити TajikLang сохта шуд: {made}")
+            return 0
+        print("Истифода: tajik лоиҳа нав номи_лоиҳа  ё  tajik муҳит соз [папка]", file=sys.stderr)
+        return EX_USAGE
+    except environment.EnvironmentError as error:
+        print(error, file=sys.stderr)
+        return EX_DATAERR
+
+
+def blocks_command(args: list[str]) -> int:
+    if args:
+        print("Истифода: tajik блокҳо", file=sys.stderr)
+        return EX_USAGE
+    from .blocks import start_blocks
+
+    try:
+        start_blocks()
+        return 0
+    except OSError:
+        print("Порти 8000 банд аст. Барномаи дигари localhost-ро қатъ кунед.", file=sys.stderr)
+        return EX_DATAERR
+
+
+def preview_command(args: list[str]) -> int:
+    if len(args) > 1:
+        print("Истифода: tajik пешнамоиш [папка]", file=sys.stderr)
+        return EX_USAGE
+    from . import web
+    from .blocks import start_preview
+
+    try:
+        result = web.build_project(args[0] if args else None)
+        start_preview(result.output)
+        return 0
+    except web.WebError as error:
+        print(error, file=sys.stderr)
+        return EX_DATAERR
+    except OSError:
+        print("Порти 8000 банд аст. Барномаи дигари localhost-ро қатъ кунед.", file=sys.stderr)
+        return EX_DATAERR
 
 
 def web_command(args: list[str]) -> int:
@@ -322,6 +412,15 @@ def main(argv: list[str] | None = None) -> int:
 
     if args and args[0] in ("ҷустуҷӯ", "гирифтан", "бастаҳо", "нест"):
         return packages_command(args)
+
+    if args and args[0] in ("лоиҳа", "муҳит"):
+        return environment_command(args[1:])
+
+    if args and args[0] in ("блокҳо", "blocks"):
+        return blocks_command(args[1:])
+
+    if args and args[0] in ("пешнамоиш", "localhost"):
+        return preview_command(args[1:])
 
     if args and args[0] in ("веб", "web"):
         return web_command(args[1:])
