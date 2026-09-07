@@ -185,6 +185,33 @@ class TestIfStatement(unittest.TestCase):
             parse("агар x\n    навис(1)\n")
         self.assertIn('аломати ":" лозим аст', ctx.exception.message)
 
+    def test_a_block_may_start_with_a_comment(self):
+        """Explaining a block on its first line is ordinary writing.
+
+        Comment and blank lines carry no indentation, so each arrives as
+        a bare NEWLINE before the INDENT — which the block rule used to
+        read as an empty block.
+        """
+        source = chr(10).join(["агар x:", "    # чӣ мекунад", "    навис(1)"])
+        self.assertEqual(len(first(source).then_branch), 1)
+
+    def test_a_block_may_start_with_a_blank_line(self):
+        source = chr(10).join(["агар x:", "", "    навис(1)"])
+        self.assertEqual(len(first(source).then_branch), 1)
+
+    def test_several_blank_and_comment_lines_before_the_body(self):
+        source = chr(10).join(
+            ["агар x:", "", "    # як", "", "    # ду", "    навис(1)"]
+        )
+        self.assertEqual(len(first(source).then_branch), 1)
+
+    def test_a_class_body_may_start_with_a_comment(self):
+        source = chr(10).join([
+            "қолиб А:", "    # шарҳ", "    функсия f(худ):",
+            "        баргардон 1",
+        ])
+        self.assertEqual(len(parse(source).statements[0].methods), 1)
+
     def test_empty_block(self):
         with self.assertRaises(ParseError) as ctx:
             parse("агар x:\nнавис(1)\n")

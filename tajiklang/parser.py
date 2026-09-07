@@ -234,6 +234,12 @@ class Parser:
             hint=f'Амалҳои "{opener.value}" -ро дар сатрҳои зерин нависед.',
         )
 
+        # Blank and comment-only lines carry no indentation, so each one
+        # arrives as a bare NEWLINE before the INDENT. Starting a block with
+        # a comment explaining it is ordinary writing, not an error.
+        while self._match(TokenType.NEWLINE):
+            pass
+
         if not self._check(TokenType.INDENT):
             raise self._error(
                 opener,
@@ -470,6 +476,8 @@ class Parser:
         self._expect(
             TokenType.NEWLINE, 'Пас аз ":" бояд сатри нав сар шавад.'
         )
+        while self._match(TokenType.NEWLINE):
+            pass
         if not self._check(TokenType.INDENT):
             raise self._error(
                 keyword,
