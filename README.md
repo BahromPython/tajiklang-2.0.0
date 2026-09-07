@@ -6,13 +6,14 @@
 
 **A programming language whose keywords, error messages and alphabet ordering are Tajik.**
 
-[**▶ Try it in your browser**](https://bahrompython.github.io/tajiklang/playground.html) &nbsp;·&nbsp;
-[**Website**](https://bahrompython.github.io/tajiklang/) &nbsp;·&nbsp;
+[**▶ Try it in your browser**](https://tajiklang.netlify.app/playground.html) &nbsp;·&nbsp;
+[**Website**](https://tajiklang.netlify.app) &nbsp;·&nbsp;
+[**⬇ Download**](https://tajiklang.netlify.app/download) &nbsp;·&nbsp;
 [**Дарсҳо — 13 lessons**](docs/дарсҳо.md) &nbsp;·&nbsp;
 [**Тоҷикӣ**](README.tg.md)
 
 [![Санҷишҳо](https://github.com/BahromPython/tajiklang/actions/workflows/tests.yml/badge.svg)](https://github.com/BahromPython/tajiklang/actions/workflows/tests.yml)
-[![Сомона](https://github.com/BahromPython/tajiklang/actions/workflows/pages.yml/badge.svg)](https://bahrompython.github.io/tajiklang/)
+[![Сомона](https://img.shields.io/badge/сомона-tajiklang.netlify.app-0f7b5f)](https://tajiklang.netlify.app)
 ![Санҷишҳо](https://img.shields.io/badge/санҷишҳо-450-0f7b5f)
 ![Python](https://img.shields.io/badge/python-3.10%20–%203.13-blue)
 [![Литсензия](https://img.shields.io/badge/литсензия-MIT-lightgrey)](LICENSE)
@@ -124,7 +125,7 @@ every mainstream language answers it with silence.
 
 ### Nothing at all
 
-[**Open the playground →**](https://bahrompython.github.io/tajiklang/playground.html)
+[**Open the playground →**](https://tajiklang.netlify.app/playground.html)
 
 Runs in one page. No install, no account.
 
@@ -133,7 +134,7 @@ Runs in one page. No install, no account.
 
 ### Windows — no Python
 
-[**Download →**](https://github.com/BahromPython/tajiklang/releases/latest)
+[**Download →**](https://tajiklang.netlify.app/download)
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File насб.ps1
@@ -318,6 +319,7 @@ Source (.tj, UTF-8)
 | `tajiklang/page.py` | `саҳифа` — building web pages |
 | `tajiklang/interop.py` | `питон` — the one door to Python's libraries |
 | `tajiklang/ide.py` | the tkinter editor |
+| `tajiklang/highlight.py` | one definition of syntax colours, shared by the editor and the site |
 | `tajiklang/packages.py` | `бастаҳо` — the package manager |
 | `tajiklang/errors.py` | Tajik errors with caret, hint and call stack |
 | `tools/` | builders for the playground, site, `.vsix`, standalone build and review sheet |
@@ -357,5 +359,5 @@ Everything planned is built. What remains is not code: a Tajik teacher reading
 
 <div align="center">
 <br>
-<sub>MIT · <a href="https://bahrompython.github.io/tajiklang/">bahrompython.github.io/tajiklang</a></sub>
+<sub>MIT · <a href="https://tajiklang.netlify.app">tajiklang.netlify.app</a></sub>
 </div>

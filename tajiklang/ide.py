@@ -24,7 +24,6 @@ the cursor there.
 
 from __future__ import annotations
 
-import re
 import sys
 import traceback
 from pathlib import Path
@@ -35,17 +34,14 @@ try:
 except ImportError:  # pragma: no cover - headless machines
     tk = None
 
-from . import __version__
+from . import __version__, highlight
 from .checker import check_program
 from .errors import TajikLangError
 from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
-from .tokens import KEYWORD_TOKENS
 
 # --- colouring --------------------------------------------------------------
-KEYWORDS = sorted(KEYWORD_TOKENS, key=len, reverse=True)
-
 THEME = {
     "bg": "#12171c",
     "panel": "#181f26",
@@ -152,7 +148,7 @@ class IDE:
         self.editor.configure(yscrollcommand=self._on_scroll)
         self._scrollbar = scroll
 
-        for name in ("keyword", "builtin", "string", "number", "comment"):
+        for name in highlight.KINDS:
             self.editor.tag_configure(name, foreground=THEME[name])
         self.editor.tag_configure("problem", background="#3a2226")
 
@@ -253,43 +249,13 @@ class IDE:
         self.gutter.yview_moveto(self.editor.yview()[0])
 
     def _highlight(self) -> None:
+        """Colour the editor using the same rules the website uses."""
         text = self.editor.get("1.0", "end-1c")
-        for tag in ("keyword", "builtin", "string", "number", "comment"):
-            self.editor.tag_remove(tag, "1.0", "end")
+        for kind in highlight.KINDS:
+            self.editor.tag_remove(kind, "1.0", "end")
 
-        # Comments and strings win over everything inside them, so they are
-        # matched first and their spans skipped by the later passes.
-        taken: list[tuple[int, int]] = []
-
-        for match in re.finditer(r"#[^\n]*", text):
-            self._tag("comment", match)
-            taken.append(match.span())
-        for match in re.finditer(r'"(?:[^"\\\n]|\\.)*"', text):
-            if any(a <= match.start() < b for a, b in taken):
-                continue
-            self._tag("string", match)
-            taken.append(match.span())
-
-        def free(match: re.Match) -> bool:
-            return not any(a <= match.start() < b for a, b in taken)
-
-        word = r"(?<![^\W\d_])({})(?![^\W\d_])"
-        for match in re.finditer(word.format("|".join(KEYWORDS)), text):
-            if free(match):
-                self._tag("keyword", match)
-        for match in re.finditer(
-            r"(?<![^\W\d_])([^\W\d_][\w_]*)(?=\s*\()", text
-        ):
-            if free(match) and match.group(1) in self.builtin_names:
-                self._tag("builtin", match)
-        for match in re.finditer(r"(?<![\w.])\d+(\.\d+)?", text):
-            if free(match):
-                self._tag("number", match)
-
-    def _tag(self, name: str, match: re.Match) -> None:
-        start = f"1.0+{match.start()}c"
-        end = f"1.0+{match.end()}c"
-        self.editor.tag_add(name, start, end)
+        for kind, begin, finish in highlight.spans(text, self.builtin_names):
+            self.editor.tag_add(kind, f"1.0+{begin}c", f"1.0+{finish}c")
 
     # ------------------------------------------------------------------
     # files

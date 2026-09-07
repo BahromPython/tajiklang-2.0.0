@@ -20,7 +20,8 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://bahrompython.github.io/tajiklang/"
+Homepage = "https://tajiklang.netlify.app"
+Download = "https://tajiklang.netlify.app/download"
 Source = "https://github.com/BahromPython/tajiklang"
 Documentation = "https://github.com/BahromPython/tajiklang/blob/main/docs/дарсҳо.md"
 

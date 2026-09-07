@@ -11,3 +11,6 @@ venv/
 # built by tools/build_site.py, published by the Pages workflow
 site/
 .DS_Store
+
+# Local Netlify folder
+.netlify
