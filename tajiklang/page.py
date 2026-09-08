@@ -94,9 +94,13 @@ class Element:
     def style_text(self) -> str:
         return "; ".join(f"{name}: {value}" for name, value in self.style.items())
 
-    def to_html(self, indent: int = 0) -> str:
+    def to_html(self, indent: int = 0, interactive: bool = False) -> str:
         pad = "  " * indent
         attributes = dict(self.attributes)
+        if not interactive:
+            # A static site must stay a normal HTML file.  TajikWeb App adds
+            # this private attribute only while a live interpreter exists.
+            attributes.pop("data-tajik-action", None)
         if self.style:
             attributes["style"] = self.style_text()
 
@@ -115,7 +119,7 @@ class Element:
         if inner:
             lines.append("  " * (indent + 1) + inner)
         for child in self.children:
-            lines.append(child.to_html(indent + 1))
+            lines.append(child.to_html(indent + 1, interactive))
         lines.append(f"{pad}</{self.tag}>")
         return chr(10).join(lines)
 
@@ -198,6 +202,10 @@ def build_module(interpreter: Any) -> dict[str, Any]:
 
     # What `нависед` produced, kept so the terminal can print or save it.
     written: list[Element] = []
+    # TajikWeb App keeps the interpreter alive and calls these ordinary
+    # TajikLang functions when a browser presses a button.
+    actions: dict[str, Any] = {}
+    action_number = 0
 
     # --- building blocks ---------------------------------------------------
     def сарлавҳа(*args: Any) -> Element:
@@ -305,8 +313,14 @@ def build_module(interpreter: Any) -> dict[str, Any]:
                 hint="Аввал функсия эълон кунед, баъд номи онро диҳед.",
             )
         style = args[2] if len(args) == 3 else None
+        nonlocal action_number
+        action_number += 1
+        action_name = f"амал_{action_number}"
+        actions[action_name] = handler
+        interpreter.page_actions = actions
         return Element(
             "button", text=_text_of(args[0]), handler=handler,
+            attributes={"data-tajik-action": action_name},
             style=_style("тугма", style),
         )
 
@@ -339,16 +353,23 @@ def build_module(interpreter: Any) -> dict[str, Any]:
         return element
 
     # --- destinations ------------------------------------------------------
-    def ҳамчун_матн(*args: Any) -> str:
-        """Саҳифаро ҳамчун матни HTML бармегардонад."""
-        elements = _elements("ҳамчун_матн", args) if args else list(written)
-        body = chr(10).join(element.to_html(0) for element in elements)
+    def _as_html(elements: list[Element], interactive: bool = False) -> str:
+        body = chr(10).join(element.to_html(0, interactive) for element in elements)
         title = "TajikLang"
         for element in elements:
             if element.tag.startswith("h") and element.text:
                 title = element.text
                 break
         return DOCUMENT.format(title=escape(title), body=body)
+
+    def ҳамчун_матн(*args: Any) -> str:
+        """Саҳифаро ҳамчун матни HTML бармегардонад."""
+        elements = _elements("ҳамчун_матн", args) if args else list(written)
+        return _as_html(elements)
+
+    # A deliberately private bridge for TajikWeb App.  It is set on the
+    # interpreter, not exposed as a new English-looking language feature.
+    interpreter.page_html = lambda: _as_html(list(written), interactive=True)
 
     def нависед(*args: Any) -> None:
         """Унсурҳоро ба саҳифа мегузорад (дар браузер) ё нигоҳ медорад."""

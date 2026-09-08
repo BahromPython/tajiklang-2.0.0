@@ -207,6 +207,7 @@ def main() -> int:
         "--hidden-import", "tajiklang.web",
         "--hidden-import", "tajiklang.blocks",
         "--hidden-import", "tajiklang.environment",
+        "--hidden-import", "tajiklang.webapp",
         # main.py, not tajiklang/__main__.py: PyInstaller runs the entry as a
         # top-level script, where `from .cli import main` has no parent
         # package to be relative to.

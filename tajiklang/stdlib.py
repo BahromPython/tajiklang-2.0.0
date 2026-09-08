@@ -755,7 +755,14 @@ def _build_file(interpreter: Any) -> dict[str, Any]:
     def _write(name: Any, text: str, append: bool) -> None:
         path = _resolve("навиштан", name)
         try:
-            with path.open("a" if append else "w", encoding="utf-8") as handle:
+            # newline="" so that "\n" is written as "\n" on every platform.
+            # Without it Windows silently turns each one into "\r\n", and a
+            # program that writes a file byte by byte gets back something it
+            # did not ask for — which is exactly how a self-hosting compiler
+            # stops matching its own output.
+            with path.open(
+                "a" if append else "w", encoding="utf-8", newline=""
+            ) as handle:
                 handle.write(text)
         except OSError as error:
             raise BuiltinError(
@@ -786,6 +793,18 @@ def _build_page(interpreter: Any) -> dict[str, Any]:
     return page.build_module(interpreter)
 
 
+def _build_data(interpreter: Any) -> dict[str, Any]:
+    from . import extras
+
+    return extras.build_data()
+
+
+def _build_http(interpreter: Any) -> dict[str, Any]:
+    from . import extras
+
+    return extras.build_http()
+
+
 # name -> builder. Each builder receives the interpreter, which is how `файл`
 # learns the program's folder and `саҳифа` learns how to call a click handler.
 BUILTIN_MODULES: dict[str, Callable[[Any], dict[str, Any]]] = {
@@ -794,4 +813,6 @@ BUILTIN_MODULES: dict[str, Callable[[Any], dict[str, Any]]] = {
     "файл": _build_file,
     "питон": _build_python,
     "саҳифа": _build_page,
+    "маълумот": _build_data,
+    "интернет": _build_http,
 }

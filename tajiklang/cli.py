@@ -10,6 +10,7 @@ TajikWeb:
     tajik веб нав <ном>              сомонаи нав месозад
     tajik веб соз [папка]            HTML-и тайёр месозад
     tajik веб омода-github [папка]   GitHub Pages-ро омода мекунад
+    tajik веб барнома [файл.tj]      саҳифаи интерактивиро дар localhost мекушояд
 
 Муҳит ва TajikBlocks:
     tajik лоиҳа нав <ном>            лоиҳа бо муҳити худаш месозад
@@ -62,6 +63,7 @@ TajikWeb:
     tajik веб нав <ном>        сомонаи нав месозад
     tajik веб соз [папка]      HTML-и тайёр месозад
     tajik веб омода-github     GitHub Pages-ро омода мекунад
+    tajik веб барнома [файл]   саҳифаи интерактивиро дар localhost мекушояд
 """
 
 BANNER = """TajikLang {version} — реҷаи интерактивӣ
@@ -394,7 +396,27 @@ def web_command(args: list[str]) -> int:
             print("  Лоиҳаро ба GitHub push кунед ва дар Settings → Pages «GitHub Actions»-ро интихоб кунед.")
             return 0
 
-        print("Фармони веб шинохта нашуд. Истифода: tajik веб нав | соз | омода-github", file=sys.stderr)
+        if command in ("барнома", "app"):
+            if len(rest) > 1:
+                print("Истифода: tajik веб барнома [файл.tj]", file=sys.stderr)
+                return EX_USAGE
+            from .webapp import AppError, start
+
+            path = Path(rest[0]) if rest else Path("index.tj")
+            if not path.is_file():
+                print(f'Файли "{path}" ёфт нашуд.', file=sys.stderr)
+                return EX_NOINPUT
+            try:
+                start(path)
+                return 0
+            except AppError as error:
+                print(error, file=sys.stderr)
+                return EX_DATAERR
+            except OSError:
+                print("Порти 8010 банд аст. Барномаи дигари localhost-ро қатъ кунед.", file=sys.stderr)
+                return EX_DATAERR
+
+        print("Фармони веб шинохта нашуд. Истифода: tajik веб нав | соз | барнома | омода-github", file=sys.stderr)
         return EX_USAGE
     except web.WebError as error:
         print(error, file=sys.stderr)

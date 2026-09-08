@@ -25,6 +25,7 @@ the cursor there.
 from __future__ import annotations
 
 import sys
+import threading
 from pathlib import Path
 
 try:
@@ -99,6 +100,9 @@ class IDE:
             ("Нав", self._new),
             ("Кушодан", self.open_dialog),
             ("Нигоҳ доштан (Ctrl+S)", self.save),
+            ("Блокҳо", self.open_blocks),
+            ("Пешнамоиш", self.preview_website),
+            ("Бастаҳо", self.show_packages),
         ):
             tk.Button(
                 bar, text=label, command=command, font=ui, relief="flat",
@@ -310,6 +314,44 @@ class IDE:
         self._refresh_files()
         self._say(f"Нигоҳ дошта шуд: {self.path.name}")
         return True
+
+    def open_blocks(self) -> None:
+        """Open the visual editor without leaving TajikLang's own IDE."""
+        from .blocks import start_blocks
+
+        def serve() -> None:
+            try:
+                start_blocks()
+            except OSError:
+                self.root.after(0, lambda: self._say("TajikBlocks аллакай кушода аст"))
+
+        threading.Thread(target=serve, daemon=True).start()
+        self._say("TajikBlocks кушода мешавад…")
+
+    def preview_website(self) -> None:
+        """Build the nearest TajikWeb project and open its localhost preview."""
+        from . import web
+        from .blocks import start_preview
+
+        def serve() -> None:
+            try:
+                result = web.build_project(self.folder)
+                start_preview(result.output)
+            except (web.WebError, OSError) as error:
+                self.root.after(0, lambda: self._say(str(error)))
+
+        threading.Thread(target=serve, daemon=True).start()
+        self._say("Пешнамоиши сомона кушода мешавад…")
+
+    def show_packages(self) -> None:
+        from . import environment, packages
+
+        project = environment.find(self.folder)
+        found = packages.installed(project)
+        text = "Бастаҳои лоиҳа:\n" if project else "Бастаҳои умумӣ:\n"
+        text += "\n".join(f"• {name} {meta.get('нусха', '?')}" for name, meta in found.items())
+        self._write(text if found else text + "Ҳоло баста насб нашудааст.")
+        self.panels.select(0)
 
     # ------------------------------------------------------------------
     # running

@@ -15,6 +15,27 @@
       "муаллиф": "TajikLang",
       "манбаъ": "https://github.com/BahromPython/tajiklang/archive/refs/heads/main.zip",
       "ҷузвдон": "шакл"
+    },
+    "ҷадвал": {
+      "тавсиф": "Ҷадвалҳои матнӣ барои рӯйхатҳо ва баҳогузорӣ",
+      "нусха": "1.0.0",
+      "муаллиф": "TajikLang",
+      "манбаъ": "https://github.com/BahromPython/tajiklang/archive/refs/heads/main.zip",
+      "ҷузвдон": "ҷадвал"
+    },
+    "бозӣ": {
+      "тавсиф": "Асбобҳои бозии матнӣ: хол ва интихоби тасодуфӣ",
+      "нусха": "1.0.0",
+      "муаллиф": "TajikLang",
+      "манбаъ": "https://github.com/BahromPython/tajiklang/archive/refs/heads/main.zip",
+      "ҷузвдон": "бозӣ"
+    },
+    "расм": {
+      "тавсиф": "Корт ва шаклҳои оддӣ барои TajikWeb",
+      "нусха": "1.0.0",
+      "муаллиф": "TajikLang",
+      "манбаъ": "https://github.com/BahromPython/tajiklang/archive/refs/heads/main.zip",
+      "ҷузвдон": "расм"
     }
   }
 }
