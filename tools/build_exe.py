@@ -8,16 +8,15 @@ run Tajik programs on it — which is the point. `pip install` assumes a Python
 installation, a working network, and a student who already knows what pip is;
 none of those are safe assumptions in a classroom.
 
-Also writes the installer and uninstaller scripts beside it, so the folder is
-a complete distribution rather than a pile of files.
-
-Requires PyInstaller **on the build machine only** — never on a student's.
+Produces the runtime used by the graphical Windows installer. PyInstaller is
+required only on the build machine — never on a student's computer.
 """
 
 from __future__ import annotations
 
 import os
 import shutil
+import struct
 import subprocess
 import sys
 from pathlib import Path
@@ -32,6 +31,27 @@ def _utf8_stdout() -> None:
     reconfigure = getattr(sys.stdout, "reconfigure", None)
     if reconfigure is not None:
         reconfigure(encoding="utf-8", errors="replace")
+
+
+def _make_icon(target: Path) -> Path:
+    """Write a dependency-free 64px TajikLang Studio .ico for the EXE."""
+    width = height = 64
+    pixels = bytearray()
+    for y in range(height - 1, -1, -1):  # ICO bitmap pixels are bottom-up
+        for x in range(width):
+            red, green, blue = (16, 33, 59)
+            if 6 <= x < 58 and 6 <= y < 58:
+                red, green, blue = (61, 214, 163)
+            # A clear, high-contrast Tajik "Т" mark.
+            if 16 <= x < 48 and 15 <= y < 23 or 28 <= x < 36 and 21 <= y < 51 or 18 <= x < 46 and 45 <= y < 53:
+                red, green, blue = (223, 252, 242)
+            pixels.extend((blue, green, red, 255))
+    header = struct.pack("<HHH", 0, 1, 1)
+    image_size = 40 + len(pixels) + (width * height // 8)
+    directory = struct.pack("<BBBBHHII", width, height, 0, 0, 1, 32, image_size, 22)
+    bitmap = struct.pack("<IIIHHIIIIII", 40, width, height * 2, 1, 32, 0, len(pixels), 0, 0, 0, 0)
+    target.write_bytes(header + directory + bitmap + pixels + bytes(width * height // 8))
+    return target
 
 
 INSTALL_PS1 = r"""# TajikLang — насбкунанда
@@ -137,22 +157,13 @@ Write-Host "Барои нест кардани онҳо низ он ҷузвдо
 READ_ME = """TajikLang — забони барномасозӣ бо забони тоҷикӣ
 ================================================
 
-Ин ҷузвдон TajikLang-и мустақил аст. Python лозим НЕСТ.
-
-НАСБ
-----
-Дар PowerShell:
-
-    powershell -ExecutionPolicy Bypass -File насб.ps1
-
-Пас аз он терминали навро кушоед.
+Ин ҷузвдон нусхаи мустақили TajikLang аст. Python лозим НЕСТ.
+Барои донишҷӯён: TajikLang Setup.exe-ро ду клик карда Install-ро пахш кунед.
+Он нишонаи TajikLang Studio-ро дар мизи корӣ месозад.
 
 ИСТИФОДА
 --------
-    tajik барнома.tj        барномаро иҷро мекунад
-    tajik                   реҷаи интерактивӣ
-    tajik муҳаррир          муҳаррирро мекушояд
-    tajik --санҷиш ф.tj     месанҷад, вале иҷро намекунад
+    Studio/TajikLang.exe    муҳаррири графикиро мекушояд
 
 БАСТАҲО
 -------
@@ -162,9 +173,9 @@ READ_ME = """TajikLang — забони барномасозӣ бо забони
 
 НЕСТ КАРДАН
 -----------
-    powershell -ExecutionPolicy Bypass -File нест.ps1
+Windows Settings → Apps → TajikLang → Uninstall
 
-Дарсҳо ва ҳуҷҷатҳо:  https://bahrompython.github.io/tajiklang/
+Дарсҳо ва ҳуҷҷатҳо:  https://github.com/BahromPython/tajiklang-2.0.0
 """
 
 
@@ -184,7 +195,9 @@ def main() -> int:
     for folder in (BUILD, DIST / "TajikLang"):
         if folder.exists():
             shutil.rmtree(folder)
+    BUILD.mkdir(parents=True, exist_ok=True)
 
+    icon = _make_icon(BUILD / "tajiklang-studio.ico")
     command = [
         sys.executable, "-m", "PyInstaller",
         "--noconfirm", "--clean",
@@ -197,6 +210,7 @@ def main() -> int:
         # before "Салом" appears.
         "--onedir",
         "--console",
+        "--icon", str(icon),
         # the bundled registry travels with the build, so `tajik ҷустуҷӯ`
         # works on a machine that has never had a network
         "--add-data", f"{ROOT / 'бастаҳо' / 'феҳрист.json'}{os.pathsep}бастаҳо",
@@ -222,8 +236,23 @@ def main() -> int:
     package = DIST / "TajikLang"
     (DIST / NAME).rename(package)
 
-    (package / "насб.ps1").write_text(INSTALL_PS1, encoding="utf-8-sig")
-    (package / "нест.ps1").write_text(UNINSTALL_PS1, encoding="utf-8-sig")
+    # The command-line tool remains available for advanced users, but the
+    # installer launches this separate windowed build. It never creates a
+    # PowerShell/cmd window behind the student-facing editor.
+    studio_dist = BUILD / "studio-dist"
+    studio_command = list(command)
+    studio_command[studio_command.index("--name") + 1] = "TajikLang"
+    studio_command[studio_command.index("--distpath") + 1] = str(studio_dist)
+    studio_command[studio_command.index("--workpath") + 1] = str(BUILD / "studio-work")
+    studio_command[studio_command.index("--specpath") + 1] = str(BUILD / "studio-spec")
+    studio_command[studio_command.index("--console")] = "--windowed"
+    studio_command[-1] = str(ROOT / "tajiklang" / "desktop.py")
+    print("TajikLang Studio сохта мешавад…")
+    result = subprocess.run(studio_command, cwd=ROOT)
+    if result.returncode != 0:
+        return result.returncode
+    shutil.copytree(studio_dist / "TajikLang", package / "Studio")
+
     (package / "ХОНЕД.txt").write_text(READ_ME, encoding="utf-8-sig")
 
     shutil.copytree(ROOT / "examples", package / "мисолҳо", dirs_exist_ok=True)
@@ -239,9 +268,7 @@ def main() -> int:
     print(f"  {package.relative_to(ROOT)}  ({size / 1024 / 1024:.0f} MB)")
     print(f"  {Path(archive).relative_to(ROOT)}")
     print()
-    print("Барои насб дар ин компютер:")
-    print(f"    powershell -ExecutionPolicy Bypass -File "
-          f"{(package / 'насб.ps1').relative_to(ROOT)}")
+    print("Барои донишҷӯён: TajikLang Setup.exe-ро истифода баред.")
     return 0
 
 

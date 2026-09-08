@@ -43,19 +43,21 @@ from .parser import Parser
 
 # --- colouring --------------------------------------------------------------
 THEME = {
-    "bg": "#12171c",
-    "panel": "#181f26",
-    "line": "#28313a",
-    "ink": "#e6ebf0",
-    "soft": "#8d9aa8",
-    "keyword": "#7cc4ff",
-    "builtin": "#c9a0ff",
-    "string": "#8ee08e",
-    "number": "#f2c078",
-    "comment": "#6b7784",
-    "error": "#ff8a80",
-    "warning": "#f2c078",
-    "accent": "#35b48b",
+    "bg": "#0b1020",
+    "panel": "#111a2d",
+    "panel_raised": "#17233a",
+    "line": "#263650",
+    "ink": "#edf3fb",
+    "soft": "#9baac0",
+    "keyword": "#86c5ff",
+    "builtin": "#d2b6ff",
+    "string": "#9be4a8",
+    "number": "#ffd084",
+    "comment": "#728198",
+    "error": "#ff9a9a",
+    "warning": "#ffd084",
+    "accent": "#3dd6a3",
+    "accent_dark": "#123f36",
 }
 
 
@@ -69,9 +71,11 @@ class IDE:
         self.builtin_names = set(interpreter.builtins.values)
         self.problems: list[tuple[int, str]] = []
 
-        root.title(f"TajikLang {__version__} — Муҳаррир")
-        root.geometry("1180x760")
+        root.title(f"TajikLang Studio {__version__}")
+        root.geometry("1240x800")
+        root.minsize(940, 620)
         root.configure(bg=THEME["bg"])
+        self._set_window_icon()
 
         self._build_layout()
         self._bind_keys()
@@ -87,32 +91,75 @@ class IDE:
     # ------------------------------------------------------------------
     # layout
     # ------------------------------------------------------------------
+    def _set_window_icon(self) -> None:
+        """A compact TajikLang mark, visible in the taskbar and title bar."""
+        icon = tk.PhotoImage(width=64, height=64)
+        icon.put("#10213b", to=(0, 0, 64, 64))
+        icon.put(THEME["accent"], to=(6, 6, 58, 58))
+        icon.put("#dffcf2", to=(16, 15, 48, 23))
+        icon.put("#dffcf2", to=(28, 21, 36, 50))
+        icon.put("#dffcf2", to=(18, 45, 46, 53))
+        self._window_icon = icon  # keep a reference; tkinter otherwise drops it
+        self.root.iconphoto(True, icon)
+
+    def _button(self, parent, label: str, command, *, primary: bool = False) -> None:
+        background = THEME["accent"] if primary else THEME["panel_raised"]
+        foreground = "#06241c" if primary else THEME["ink"]
+        active = "#67e7bd" if primary else THEME["line"]
+        tk.Button(
+            parent, text=label, command=command, font=("Segoe UI", 10, "bold"),
+            relief="flat", bg=background, fg=foreground, activebackground=active,
+            activeforeground=foreground, padx=13, pady=8, cursor="hand2",
+            borderwidth=0, highlightthickness=0,
+        ).pack(side="left", padx=(0, 7))
+
     def _build_layout(self) -> None:
-        mono = tkfont.Font(family="Consolas", size=12)
+        mono = tkfont.Font(family="Cascadia Code", size=12)
         ui = tkfont.Font(family="Segoe UI", size=10)
         self.mono = mono
 
-        bar = tk.Frame(self.root, bg=THEME["panel"])
-        bar.pack(fill="x")
-        for label, command in (
-            ("▶  Иҷро (F5)", self.run),
-            ("✓  Санҷиш (F6)", self.check),
-            ("Нав", self._new),
-            ("Кушодан", self.open_dialog),
-            ("Нигоҳ доштан (Ctrl+S)", self.save),
-            ("Блокҳо", self.open_blocks),
-            ("Пешнамоиш", self.preview_website),
-            ("Бастаҳо", self.show_packages),
-        ):
-            tk.Button(
-                bar, text=label, command=command, font=ui, relief="flat",
-                bg=THEME["panel"], fg=THEME["ink"], activebackground=THEME["line"],
-                activeforeground=THEME["ink"], padx=12, pady=7, cursor="hand2",
-                borderwidth=0,
-            ).pack(side="left")
+        style = ttk.Style(self.root)
+        style.theme_use("clam")
+        style.configure("TNotebook", background=THEME["panel"], borderwidth=0)
+        style.configure(
+            "TNotebook.Tab", background=THEME["panel"], foreground=THEME["soft"],
+            padding=(14, 9), font=("Segoe UI", 9, "bold"), borderwidth=0,
+        )
+        style.map("TNotebook.Tab", background=[("selected", THEME["bg"])],
+                  foreground=[("selected", THEME["ink"])])
+
+        header = tk.Frame(self.root, bg=THEME["panel"], padx=18, pady=12)
+        header.pack(fill="x")
+        mark = tk.Label(header, text="Т", font=("Segoe UI", 18, "bold"),
+                        width=3, bg=THEME["accent"], fg="#06241c", pady=3)
+        mark.pack(side="left", padx=(0, 10))
+        brand = tk.Frame(header, bg=THEME["panel"])
+        brand.pack(side="left", padx=(0, 28))
+        tk.Label(brand, text="TajikLang Studio", font=("Segoe UI", 13, "bold"),
+                 bg=THEME["panel"], fg=THEME["ink"]).pack(anchor="w")
+        tk.Label(brand, text="Муҳаррири барномасозии тоҷикӣ", font=("Segoe UI", 8),
+                 bg=THEME["panel"], fg=THEME["soft"]).pack(anchor="w")
+
+        actions = tk.Frame(header, bg=THEME["panel"])
+        actions.pack(side="left")
+        self._button(actions, "▶ Иҷро", self.run, primary=True)
+        self._button(actions, "✓ Санҷиш", self.check)
+        self._button(actions, "Нав", self._new)
+        self._button(actions, "Кушодан", self.open_dialog)
+        self._button(actions, "Нигоҳ доштан", self.save)
+
+        tools = tk.Frame(self.root, bg=THEME["panel_raised"], padx=18, pady=7)
+        tools.pack(fill="x")
+        for label, command in (("◈ TajikBlocks", self.open_blocks),
+                               ("◉ Пешнамоиши сомона", self.preview_website),
+                               ("◫ Бастаҳо", self.show_packages)):
+            tk.Button(tools, text=label, command=command, font=ui, relief="flat",
+                      bg=THEME["panel_raised"], fg=THEME["soft"],
+                      activebackground=THEME["line"], activeforeground=THEME["ink"],
+                      padx=9, pady=2, cursor="hand2", borderwidth=0).pack(side="left")
 
         self.status = tk.Label(
-            bar, text="", font=ui, bg=THEME["panel"], fg=THEME["soft"], padx=12
+            tools, text="Омода", font=ui, bg=THEME["panel_raised"], fg=THEME["soft"], padx=12
         )
         self.status.pack(side="right")
 
@@ -182,8 +229,8 @@ class IDE:
         body.add(files_frame, width=250)
 
         tk.Label(
-            files_frame, text="  Файлҳо", anchor="w", font=("Segoe UI", 10, "bold"),
-            bg=THEME["panel"], fg=THEME["soft"], pady=8,
+            files_frame, text="  ФАЙЛҲОИ ЛОИҲА", anchor="w", font=("Segoe UI", 9, "bold"),
+            bg=THEME["panel"], fg=THEME["soft"], pady=12,
         ).pack(fill="x")
 
         self.file_list = tk.Listbox(
@@ -279,7 +326,7 @@ class IDE:
         self.editor.insert("1.0", path.read_text(encoding="utf-8"))
         self.path = path
         self.folder = path.parent
-        self.root.title(f"TajikLang {__version__} — {path.name}")
+        self.root.title(f"TajikLang Studio — {path.name}")
         self._after_edit()
         self._say(f"Кушода шуд: {path.name}")
 
@@ -287,7 +334,7 @@ class IDE:
         self.editor.delete("1.0", "end")
         self.editor.insert("1.0", 'навис("Салом Тоҷикистон!")\n')
         self.path = None
-        self.root.title(f"TajikLang {__version__} — файли нав")
+        self.root.title(f"TajikLang Studio — файли нав")
         self._after_edit()
 
     def open_dialog(self) -> None:
