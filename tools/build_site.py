@@ -23,7 +23,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 REPO = "https://github.com/BahromPython/tajiklang"
-DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-windows.zip"
+# Keep the public call-to-action on our own domain.  Netlify redirects this
+# stable address to the current GitHub release asset (see netlify.toml).
+DOWNLOAD = "/download"
 RELEASES = f"{REPO}/releases/latest"
 
 sys.path.insert(0, str(ROOT))
@@ -176,6 +178,14 @@ STYLE = """
   .card { border: 1px solid var(--line); border-radius: 13px; padding: 20px 22px; background: var(--panel); }
   .card h3 { margin: 0 0 8px; font-size: 17px; }
   .card p { margin: 0; color: var(--soft); font-size: 15.5px; }
+  .download-card {
+    margin: 26px 0 0; padding: 28px; border-radius: 16px;
+    border: 1px solid #14916d; background: linear-gradient(135deg, var(--accent-soft), var(--panel));
+  }
+  .download-card h2 { margin-bottom: 8px; }
+  .download-card .cta { margin: 20px 0 10px; }
+  .download-meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+  .pill { border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--soft); font-size: 13px; background: var(--bg); }
 
   .steps { counter-reset: s; padding: 0; list-style: none; }
   .steps li { counter-increment: s; position: relative; padding-right: 42px; margin-bottom: 22px; }
@@ -438,12 +448,29 @@ def install_page(f: dict[str, str]) -> str:
 <div class="wrap">
 
 <header>
-  <h1>Насб кардан</h1>
-  <p class="lede">Се роҳ. Аввалин ҳеҷ чиз талаб намекунад.</p>
+  <h1>TajikLang-ро<br>ба компютер гиред</h1>
+  <p class="lede">Барои Windows — як боргирӣ, бе Python ва бе насби иловагӣ.
+     Тайёр барои синфхона, хона ва лоиҳаҳои ҷиддӣ.</p>
+
+  <div class="download-card">
+    <h2>TajikLang {f['version']} барои Windows</h2>
+    <p class="quiet">Нусхаи пурраи мустақил: забон, муҳаррир, TajikBlocks,
+       муҳити лоиҳаҳо ва намунаҳои омӯзишӣ.</p>
+    <div class="cta">
+      <a class="btn primary" href="{DOWNLOAD}">⬇ Зеркашӣ барои Windows</a>
+      <a class="btn" href="{RELEASES}">Ҳамаи нашрҳо</a>
+    </div>
+    <div class="download-meta">
+      <span class="pill">Windows 10 / 11 · 64-bit</span>
+      <span class="pill">ZIP · 11.7 МБ</span>
+      <span class="pill">Python лозим нест</span>
+      <span class="pill">Версияи {f['version']}</span>
+    </div>
+  </div>
 </header>
 
 <section style="border-top:0; padding-top:0">
-  <h2>1 · Бе ҳеҷ насб</h2>
+  <h2>1 · Бе ҳеҷ насб — дар браузер</h2>
   <p class="sub">Тамоми забон дар як саҳифа кор мекунад. Барои мактабҳо роҳи
      соддатарин.</p>
   <div class="cta">
@@ -452,15 +479,9 @@ def install_page(f: dict[str, str]) -> str:
 </section>
 
 <section>
-  <h2>2 · Windows</h2>
+  <h2>2 · Пас аз зеркашӣ чӣ кор кунед</h2>
   <p class="sub">Нусхаи мустақил барои мактаб ва хона. Ҳеҷ чизи дигар лозим
      нест — на Python, на интернети доимӣ.</p>
-
-  <div class="cta">
-    <a class="btn primary" href="{DOWNLOAD}">⬇ TajikLang {f['version']} барои Windows</a>
-    <a class="btn" href="{RELEASES}">Ҳама файлҳо</a>
-  </div>
-  <p class="note">ZIP, тақрибан 11 МБ. Дарунаш барномаҳои намунавӣ ва дарсҳо низ ҳаст.</p>
 
   <ol class="steps" style="margin-top:30px">
     <li><b>Боргирӣ ва кушодан</b>
@@ -480,7 +501,7 @@ tajik муҳаррир        муҳаррирро мекушояд</pre></li>
 </section>
 
 <section>
-  <h2>3 · Аз манбаъ</h2>
+  <h2>3 · Аз манбаъ — барои таҳиягарон</h2>
   <p class="sub">Ин роҳ барои онҳоест, ки мехоҳанд худи забонро тағйир диҳанд
      ё дар таҳияи он ҳисса гузоранд. Барои омӯзиш роҳи 1 ё 2 кофист.</p>
   <pre class="out">pip install git+{REPO}.git</pre>
@@ -489,7 +510,16 @@ tajik муҳаррир        муҳаррирро мекушояд</pre></li>
 </section>
 
 <section>
-  <h2>Муҳаррирҳо</h2>
+  <h2>Дар дохили зеркашӣ чӣ ҳаст</h2>
+
+  <div class="cards">
+    <div class="card"><h3>Муҳаррири TajikLang</h3><p>Дарахти лоиҳаҳо, ранга кардани код, хатогиҳои тоҷикӣ, пешнамоиш ва F5 барои иҷро.</p></div>
+    <div class="card"><h3>TajikBlocks</h3><p>Барномасозии блокӣ барои оғози осон — бо нигоҳ доштан, кушодан, тағйирёбандаҳо ва функсияҳо.</p></div>
+    <div class="card"><h3>Муҳити лоиҳа</h3><p>Ҳар лоиҳа ҷудо аст: бастаҳо, вебсаҳифаҳо ва файлҳои худи он дар як ҷо нигоҳ дошта мешаванд.</p></div>
+    <div class="card"><h3>Намунаҳо ва дарсҳо</h3><p>Барномаҳои тайёрро боз кунед, тағйир диҳед ва аз онҳо омӯзед — ҳатто ҳангоми набудани интернет.</p></div>
+  </div>
+
+  <h2 style="margin-top:52px">Муҳаррирҳо</h2>
 
   <h3>Муҳаррири худӣ</h3>
   <p>Бо забон меояд. Дарахти файлҳо, ранга кардан, панели хатоҳо, F5 — иҷро,

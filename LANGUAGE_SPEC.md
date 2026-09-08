@@ -64,8 +64,13 @@ Identifiers are case-sensitive. Reserved words (§7) may not be used as names.
 | List | `[1, 2, 3]`, `[]` |
 | Dictionary | `{"ном": "Баҳром"}`, `{}` |
 
-String escapes: `\n`, `\t`, `\"`, `\\`. Any other escape is an error. Strings
-may not span lines.
+String escapes: `\n`, `\t`, `\r`, `\"`, `\\`. Any other escape is an error.
+Strings may not span lines.
+
+`\r` is in the list for a reason worth stating: text files arrive with CRLF
+line endings, and a language whose programs cannot name a carriage return
+cannot write a lexer for the files people actually have. It was added when the
+self-hosting compiler in `худсоз/` needed it — see that folder's README.
 
 ### 2.4 Operators
 

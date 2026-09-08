@@ -117,6 +117,42 @@ every mainstream language answers it with silence.
 
 ---
 
+## It compiles itself
+
+A language that only exists as somebody else's program is a wrapper. TajikLang
+is not one: [`худсоз/`](худсоз/) holds a TajikLang compiler **written in
+TajikLang**, which reads `.tj` files and emits JavaScript.
+
+```
+насли 0    the reference implementation compiles the compiler   → .js
+насли 1    node runs that .js on the same sources               → .js
+насли 2    node runs *that* .js on the same sources             → .js
+```
+
+Two properties are tested on every run, and they check different things:
+
+* **насли 1 == насли 2** — the compiler is a fixed point. A bug that changed
+  its own output would make the second pass drift from the first.
+* **насли 0 == насли 1** — two implementations, one in Python and one in
+  JavaScript, produce byte-identical output. The program under test is the
+  compiler itself, so any disagreement between them shows up as a diff.
+
+It has already earned its keep. The Tajik-written lexer did not know the `\r`
+escape and turned it into a plain `r`, which quietly made the letter **r** a
+separator — `ба_javascript` lexed as `ба_javasc` and `ipt`. No ordinary test
+would have caught that; the fixpoint test caught it on the first pass.
+
+The exact-decimal arithmetic, the ban on truthiness and the Tajik alphabet
+order all survive the trip: `0.1 + 0.2 == 0.3` is `рост` under Node too, and
+`тартиб` still puts `ғоз` after `гул`. See [`худсоз/README.md`](худсоз/README.md)
+for what the self-hosted compiler supports so far, and what it does not.
+
+```powershell
+powershell -File худсоз\санҷиши_худсозӣ.ps1
+```
+
+---
+
 ## Install
 
 <table>
@@ -197,6 +233,41 @@ a classroom offline still gets a working `ҷустуҷӯ`. Installing only ever 
 
 Both starter packages — `омор` (median, mode, variance) and `шакл` (boxes,
 bar charts) — are **written in TajikLang**, not Python.
+
+### TajikWeb · Сомонасозӣ
+
+Build a real static website with TajikLang — then host the resulting normal
+HTML anywhere. The first version deliberately has no framework, no JavaScript
+toolchain, and no account requirement.
+
+```bash
+tajik веб нав сомонаи_ман
+cd сомонаи_ман
+tajik веб соз
+```
+
+Write the page in `index.tj` with the Tajik `саҳифа` module. The ready-to-host
+site is `нашр/index.html`; files placed in `static/` are copied there too.
+
+```tajik
+ворид саҳифа
+
+саҳифа.нависед(
+    саҳифа.сарлавҳа("Сомонаи ман"),
+    саҳифа.матн("Салом аз Тоҷикистон!"),
+    саҳифа.рӯйхат(["Барнома", "Лоиҳаҳо", "Тамос"]),
+)
+```
+
+To publish from a GitHub repository, add a ready-made Pages workflow:
+
+```bash
+tajik веб омода-github
+```
+
+Push the project and select **GitHub Actions** under the repository's
+**Settings → Pages**. Each later push rebuilds and publishes the site. See
+[docs/веб.md](docs/веб.md) for the small, complete guide.
 
 ### The editor
 
@@ -317,6 +388,7 @@ Source (.tj, UTF-8)
 | `tajiklang/stdlib.py` | 56 built-in functions, plus `риёзӣ` and `матн` |
 | `tajiklang/collation.py` | Tajik alphabet order |
 | `tajiklang/page.py` | `саҳифа` — building web pages |
+| `tajiklang/web.py` | `TajikWeb` — create and build static TajikLang sites |
 | `tajiklang/interop.py` | `питон` — the one door to Python's libraries |
 | `tajiklang/ide.py` | the tkinter editor |
 | `tajiklang/highlight.py` | one definition of syntax colours, shared by the editor and the site |
@@ -354,8 +426,14 @@ tools rather than edited by hand. CI checks both.
 
 ## Roadmap
 
-Everything planned is built. What remains is not code: a Tajik teacher reading
-`ТАРҶУМА.md`, and students using it.
+The self-hosted compiler in [`худсоз/`](худсоз/) covers the subset it needed to
+compile itself. Classes, `кӯшиш`/`хато`, the `|>` operator and the standard
+modules are still reference-implementation only; extending it is the next piece
+of real work, and finishing it would let the playground drop its 6 MB CPython
+download for a few kilobytes of JavaScript.
+
+Everything else planned is built. What remains is not code: a Tajik teacher
+reading `ТАРҶУМА.md`, and students using it.
 
 <div align="center">
 <br>

@@ -22,6 +22,13 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      # Барои санҷиши худсозӣ: тарҷумони худсохт JavaScript мебарорад.
+      # Бе Node санҷишҳои `tests/test_bootstrap.py` гузаронда мешаванд, на
+      # ноком — вале дар CI мо мехоҳем, ки онҳо воқеан иҷро шаванд.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Тестҳоро иҷро кардан
         run: python -m unittest discover -s tests -t . -v
 
@@ -54,6 +61,63 @@ jobs:
               echo "$file бояд хато медод"; exit 1
             fi
           done
+
+  bootstrap:
+    name: Забон худашро месозад
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Се насл сохтан
+        working-directory: худсоз
+        run: |
+          set -e
+          echo "--- насли 0: тарҷумони асосӣ ---"
+          python ../main.py худсозӣ.tj
+          mkdir -p насли0 && cp лексер.js тарҷумон.js худсозӣ.js насли0/
+
+          echo "--- насли 1: JavaScript худашро месозад ---"
+          node худсозӣ.js
+          mkdir -p насли1 && cp лексер.js тарҷумон.js худсозӣ.js насли1/
+
+          echo "--- насли 2: боз як бор ---"
+          node худсозӣ.js
+          mkdir -p насли2 && cp лексер.js тарҷумон.js худсозӣ.js насли2/
+
+      # Файлҳои .js дар анбор нигоҳ дошта мешаванд, то касе, ки танҳо Node
+      # дорад, забонро бе Python иҷро карда тавонад. Пас онҳо бояд ҳамеша аз
+      # манбаи ҳозира сохта шуда бошанд.
+      - name: Тухмии сохташуда бояд тоза бошад
+        run: |
+          if [ -n "$(git status --porcelain худсоз/лексер.js худсоз/тарҷумон.js худсоз/худсозӣ.js)" ]; then
+            echo "Файлҳои .js кӯҳна шудаанд — «node худсозӣ.js» иҷро кунед ва фиристед:"
+            git --no-pager diff --stat -- худсоз
+            exit 1
+          fi
+
+      - name: Насли 1 ва насли 2 бояд айнан баробар бошанд
+        working-directory: худсоз
+        run: diff -r насли1 насли2
+
+      - name: Насли 0 ва насли 1 бояд айнан баробар бошанд
+        working-directory: худсоз
+        run: diff -r насли0 насли1
+
+      - name: Барномаи намуна дар ҳар ду муҳит як натиҷа медиҳад
+        working-directory: худсоз
+        run: |
+          set -e
+          python ../main.py намуна.tj > аз_асос.txt
+          python ../main.py санҷиш.tj > /dev/null
+          node намуна.js > аз_node.txt
+          diff аз_асос.txt аз_node.txt
+          rm -rf насли0 насли1 насли2 аз_асос.txt аз_node.txt намуна.js
 
   artifacts:
     name: Майдонча ва васеъкунӣ аз нав сохта мешаванд

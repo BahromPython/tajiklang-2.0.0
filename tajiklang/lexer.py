@@ -36,12 +36,13 @@ _B = chr(92)
 ESCAPES = {
     "n": "\n",
     "t": "\t",
-    '"': '"',
+    "r": "\r",       # real files arrive with CRLF; a program should be able
+    '"': '"',        # to say so
     _B: _B,
 }
 
 ESCAPE_HINT = (
-    "Танҳо " + _B + "n, " + _B + "t, " + _B + '" ва ' + _B + _B
+    "Танҳо " + _B + "n, " + _B + "t, " + _B + "r, " + _B + '" ва ' + _B + _B
     + " иҷозат дода мешаванд."
 )
 
