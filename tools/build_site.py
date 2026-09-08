@@ -22,10 +22,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
-REPO = "https://github.com/BahromPython/tajiklang"
-# The standalone installer is deployed alongside the public website. This lets
-# a student install TajikLang from one trusted link without a GitHub account.
-DOWNLOAD = "/TajikLang-windows.zip"
+REPO = "https://github.com/BahromPython/tajiklang-2.0.0"
+# Netlify hosts the public site; GitHub Releases host the signed-by-checksum
+# platform artifacts.  This stable link always selects the newest Windows
+# x64 installer, which is the right choice for nearly every student.
+DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-windows-x64.zip"
 RELEASES = f"{REPO}/releases/latest"
 
 sys.path.insert(0, str(ROOT))
