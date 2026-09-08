@@ -13,18 +13,18 @@
 [build.environment]
   PYTHON_VERSION = "3.12"
 
-# The download button points at the newest GitHub release asset, so a new
-# release needs no site change. This alias gives it a tidier URL.
+# The Windows installer is shipped with the public site, so students do not
+# need a GitHub account or Python. These aliases keep the download URL short.
 [[redirects]]
   from = "/download"
-  to = "https://github.com/BahromPython/tajiklang/releases/latest/download/TajikLang-windows.zip"
-  status = 302
+  to = "/TajikLang-windows.zip"
+  status = 301
   force = true
 
 [[redirects]]
   from = "/боргирӣ"
-  to = "https://github.com/BahromPython/tajiklang/releases/latest/download/TajikLang-windows.zip"
-  status = 302
+  to = "/TajikLang-windows.zip"
+  status = 301
   force = true
 
 # The install page was briefly published under a Cyrillic filename. Keep any

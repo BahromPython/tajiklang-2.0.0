@@ -23,9 +23,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 REPO = "https://github.com/BahromPython/tajiklang"
-# Keep the public call-to-action on our own domain.  Netlify redirects this
-# stable address to the current GitHub release asset (see netlify.toml).
-DOWNLOAD = "/download"
+# The standalone installer is deployed alongside the public website. This lets
+# a student install TajikLang from one trusted link without a GitHub account.
+DOWNLOAD = "/TajikLang-windows.zip"
 RELEASES = f"{REPO}/releases/latest"
 
 sys.path.insert(0, str(ROOT))
@@ -458,7 +458,7 @@ def install_page(f: dict[str, str]) -> str:
        муҳити лоиҳаҳо ва намунаҳои омӯзишӣ.</p>
     <div class="cta">
       <a class="btn primary" href="{DOWNLOAD}">⬇ Зеркашӣ барои Windows</a>
-      <a class="btn" href="{RELEASES}">Ҳамаи нашрҳо</a>
+      <a class="btn" href="{REPO}">Коди манбаъ</a>
     </div>
     <div class="download-meta">
       <span class="pill">Windows 10 / 11 · 64-bit</span>
