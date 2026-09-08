@@ -17,13 +17,13 @@
 # student-facing Netlify download URL short and always select Windows x64.
 [[redirects]]
   from = "/download"
-  to = "https://github.com/BahromPython/tajiklang-2.0.0/releases/latest/download/TajikLang-windows-x64.zip"
+  to = "https://github.com/BahromPython/tajiklang-2.0.0/releases/latest/download/TajikLang-Setup-Windows-x64.exe"
   status = 302
   force = true
 
 [[redirects]]
   from = "/боргирӣ"
-  to = "https://github.com/BahromPython/tajiklang-2.0.0/releases/latest/download/TajikLang-windows-x64.zip"
+  to = "https://github.com/BahromPython/tajiklang-2.0.0/releases/latest/download/TajikLang-Setup-Windows-x64.exe"
   status = 302
   force = true
 
