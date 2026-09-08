@@ -26,7 +26,7 @@ REPO = "https://github.com/BahromPython/tajiklang-2.0.0"
 # Netlify hosts the public site; GitHub Releases host the signed-by-checksum
 # platform artifacts.  This stable link always selects the newest Windows
 # x64 installer, which is the right choice for nearly every student.
-DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-windows-x64.zip"
+DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-Setup-Windows-x64.exe"
 RELEASES = f"{REPO}/releases/latest"
 
 sys.path.insert(0, str(ROOT))
@@ -463,7 +463,7 @@ def install_page(f: dict[str, str]) -> str:
     </div>
     <div class="download-meta">
       <span class="pill">Windows 10 / 11 · 64-bit</span>
-      <span class="pill">ZIP · 11.7 МБ</span>
+      <span class="pill">Насбкунанда · .exe</span>
       <span class="pill">Python лозим нест</span>
       <span class="pill">Версияи {f['version']}</span>
     </div>
@@ -485,20 +485,17 @@ def install_page(f: dict[str, str]) -> str:
      нест — на Python, на интернети доимӣ.</p>
 
   <ol class="steps" style="margin-top:30px">
-    <li><b>Боргирӣ ва кушодан</b>
-        Файли ZIP-ро боргирӣ карда, ба ҷузвдони худ кушоед.</li>
-    <li><b>Насбкунандаро иҷро кунед</b>
-        <pre class="out">powershell -ExecutionPolicy Bypass -File насб.ps1</pre>
-        Ин фармони <code>tajik</code>-ро ба PATH илова мекунад, файлҳои
-        <code>.tj</code>-ро мепайвандад (ду клик — иҷро) ва муҳаррирро ба
-        менюи Start мегузорад.</li>
-    <li><b>Терминали навро кушоед</b>
-        <pre class="out">tajik                 реҷаи интерактивӣ
-tajik барнома.tj      барномаро иҷро мекунад
-tajik муҳаррир        муҳаррирро мекушояд</pre></li>
+    <li><b>Файли <code>.exe</code>-ро кушоед</b>
+        Файли «TajikLang Setup»-ро, ки боргирӣ шуд, ду клик кунед.</li>
+    <li><b>Танҳо «Install»-ро пахш кунед</b>
+        Насбкунанда муҳаррири TajikLang-ро ба мизи корӣ ва менюи Start мегузорад.
+        Python, PowerShell ва сатри фармон тамоман лозим нест.</li>
+    <li><b>Аз мизи корӣ оғоз кунед</b>
+        Нишонаи <strong>TajikLang</strong>-ро пахш кунед. Муҳаррири худии забон
+        кушода мешавад — барои навиштан, иҷро кардан ва сохтани лоиҳаҳо.</li>
   </ol>
 
-  <p class="quiet">Барои нест кардан: <code>нест.ps1</code> дар ҳамон ҷузвдон.</p>
+  <p class="quiet">Барои нест кардан: Settings → Apps → TajikLang → Uninstall.</p>
 </section>
 
 <section>
@@ -525,11 +522,11 @@ tajik муҳаррир        муҳаррирро мекушояд</pre></li>
   <h3>Муҳаррири худӣ</h3>
   <p>Бо забон меояд. Дарахти файлҳо, ранга кардан, панели хатоҳо, F5 — иҷро,
      F6 — санҷиш.</p>
-  <pre class="out">tajik муҳаррир</pre>
+  <p class="quiet">Пас аз насб онро аз нишонаи TajikLang дар мизи корӣ кушоед.</p>
 
-  <h3>VS Code</h3>
-  <p>Васеъкуниро аз саҳифаи нашрҳо боргирӣ кунед:</p>
-  <pre class="out">code --install-extension tajiklang-{f['version']}.vsix</pre>
+  <h3>VS Code — танҳо агар аллакай истифода мекунед</h3>
+  <p>Ин ихтиёрӣ аст. Дар VS Code бахши <strong>Extensions</strong>-ро кушоед,
+     аз меню «Install from VSIX…»-ро интихоб карда, файли TajikLang-ро интихоб кунед.</p>
   <div class="cta">
     <a class="btn" href="{RELEASES}">⬇ Васеъкунии VS Code</a>
   </div>

@@ -172,12 +172,9 @@ Runs in one page. No install, no account.
 
 [**Download →**](https://tajiklang.netlify.app/download)
 
-```powershell
-powershell -ExecutionPolicy Bypass -File насб.ps1
-```
-
-Adds `tajik` to PATH, opens `.tj` files on double-click, and puts the editor
-in the Start menu.
+Download the **TajikLang Setup `.exe`**, double-click it, and press **Install**.
+It creates a desktop shortcut and Start-menu entry for the TajikLang editor;
+no PowerShell, Python, or command prompt is required.
 
 </td>
 <td width="33%" valign="top">
@@ -185,7 +182,7 @@ in the Start menu.
 ### With Python
 
 ```bash
-pip install git+https://github.com/BahromPython/tajiklang.git
+pip install git+https://github.com/BahromPython/tajiklang-2.0.0.git
 ```
 
 </td>
@@ -282,15 +279,10 @@ checker found *before* the program runs; click a problem to jump to its line.
 
 ### VS Code
 
-```bash
-py tools/build_vsix.py
-code --install-extension dist/tajiklang-2.0.0.vsix
-```
-
-Syntax highlighting, 4-space indentation enforced (the language rejects tabs),
-and **Ctrl+Shift+B** to run the open file. `build_vsix.py` packages the
-extension with the standard library alone — no `npm`, no `vsce`, no network,
-because *"install Node.js first"* is a poor answer for a school in Dushanbe.
+The TajikLang editor is installed by default. VS Code support is optional for
+students who already use VS Code: download the `.vsix`, open **Extensions**,
+choose **Install from VSIX…**, and select the downloaded file. It provides
+syntax highlighting and **Ctrl+Shift+B** to run the open file.
 
 ---
 

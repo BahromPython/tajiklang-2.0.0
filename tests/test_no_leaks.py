@@ -150,6 +150,16 @@ class TestShippedSurfaces(unittest.TestCase):
         self.assertIn("Ҳеҷ чизи дигар лозим", text)
         self.assertIn("худи забонро тағйир диҳанд", text)
 
+    def test_the_installer_never_requires_a_command_prompt(self):
+        """The ordinary student path is click-to-install, not a shell script."""
+        install = ROOT / "site" / "install.html"
+        if not install.exists():
+            self.skipTest("site not built")
+        text = install.read_text(encoding="utf-8").lower()
+        self.assertNotIn("powershell -executionpolicy", text)
+        self.assertNotIn("code --install-extension", text)
+        self.assertIn("мизи корӣ", text)
+
 
 if __name__ == "__main__":
     unittest.main()

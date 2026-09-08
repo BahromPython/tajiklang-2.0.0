@@ -94,7 +94,7 @@ def main() -> int:
         tags=escape(",".join(package.get("keywords", []) or ["tajiklang"])),
         categories=escape(",".join(package.get("categories", ["Programming Languages"]))),
         engine=escape(package["engines"]["vscode"]),
-        repository=escape("https://github.com/BahromPython/tajiklang"),
+        repository=escape("https://github.com/BahromPython/tajiklang-2.0.0"),
     )
 
     files = sorted(
