@@ -18,6 +18,50 @@ CONFIG = "лоиҳа.json"
 LIBRARY = "китобхона"
 MAIN_FILE = "барнома.tj"
 
+# A TajikLang project begins with a useful, runnable artefact.  Templates are
+# deliberately files rather than hidden generator logic, so students can read
+# every line the moment the project is created.
+PROJECT_KINDS = {
+    "console": "Консолӣ",
+    "web": "Сомонаи интерактивӣ",
+    "game": "Бозии хурд",
+    "blocks": "TajikBlocks",
+    "data": "Маълумот ва ҷадвалҳо",
+}
+
+TEMPLATES = {
+    "console": (
+        "# Барномаи аввалини ман\n"
+        'дода ном <- "Баҳром"\n'
+        'нишон "Салом", ном\n'
+    ),
+    "web": (
+        "# Барои оғоз: tajik веб барнома барнома.tj\n"
+        "ворид саҳифа\n\n"
+        "саҳифа.нависед(\n"
+        '    саҳифа.сарлавҳа("Салом аз TajikLang"),\n'
+        '    саҳифа.матн("Ин сомона бо TajikLang сохта шуд."),\n'
+        ")\n"
+    ),
+    "game": (
+        "# Бозии аввалини ман\n"
+        "дода хол <- 0\n"
+        'нишон "Бозӣ оғоз шуд. Хол:", хол\n'
+        "# Барои асбобҳои бозӣ: tajik гирифтан бозӣ\n"
+    ),
+    "blocks": (
+        "# Ин файлро дар TajikBlocks ё Studio кушоед.\n"
+        'дода қаҳрамон <- "Ситора"\n'
+        'нишон "Салом аз", қаҳрамон\n'
+    ),
+    "data": (
+        "# Кор бо маълумот\n"
+        "дода холҳо <- [18, 20, 17]\n"
+        'нишон "Шумора:", дарозӣ(холҳо)\n'
+        "# Барои ҷадвалҳо: tajik гирифтан ҷадвал\n"
+    ),
+}
+
 
 class EnvironmentError(Exception):
     """A problem the command line can explain in Tajik."""
@@ -61,28 +105,30 @@ def create_environment(root: str | Path) -> Path:
     return folder
 
 
-def create_project(name: str, parent: str | Path | None = None) -> Path:
-    """Create a project with its own local library from the first minute."""
+def create_project(
+    name: str, parent: str | Path | None = None, kind: str = "console"
+) -> Path:
+    """Create a named project and its visible, project-local environment."""
     if not re.fullmatch(r"[^\\/:*?\"<>|.][^\\/:*?\"<>|]*", name):
         raise EnvironmentError("Номи лоиҳа нодуруст аст.")
     base = Path.cwd() if parent is None else Path(parent)
     project = base / name
     if project.exists():
         raise EnvironmentError(f'Папкаи "{project}" аллакай вуҷуд дорад.')
+    if kind not in PROJECT_KINDS:
+        choices = ", ".join(PROJECT_KINDS)
+        raise EnvironmentError(f'Навъи лоиҳаи "{kind}" шинохта нашуд. Интихобҳо: {choices}.')
 
     project.mkdir(parents=True)
     create_environment(project)
-    (project / MAIN_FILE).write_text(
-        "# Барномаи аввалини ман\n"
-        'навис("Салом аз лоиҳаи ман!")\n',
-        encoding="utf-8",
-    )
+    (project / MAIN_FILE).write_text(TEMPLATES[kind], encoding="utf-8")
     (project / "README.md").write_text(
         f"# {name}\n\n"
-        "Ин лоиҳаи TajikLang аст.\n\n"
+        f"Ин лоиҳаи TajikLang аст: **{PROJECT_KINDS[kind]}**.\n\n"
         "- Барномаи асосӣ: `барнома.tj`\n"
         "- Бастаҳои ҳамин лоиҳа: `.tajiklang/китобхона/`\n"
-        "- Насби бастаи маҳаллӣ: `tajik гирифтан --лоиҳа омор`\n",
+        "- Насби бастаи маҳаллӣ: `tajik гирифтан --лоиҳа омор`\n"
+        "- Пешнамоиш дар Studio: тугмаи ▶ Иҷро\n",
         encoding="utf-8",
     )
     return project

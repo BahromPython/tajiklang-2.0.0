@@ -13,14 +13,16 @@
       <button class="activity-button" title="Ҷустуҷӯ" data-panel="search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg></button>
       <button class="activity-button" title="Бастаҳо" data-panel="packages"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></button>
       <button class="activity-button" title="Иҷро" id="activity-run"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg></button>
-      <button class="activity-button" title="TajikBlocks"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="8" height="8"/><rect x="12" y="12" width="8" height="8"/></svg></button>
+      <button class="activity-button" title="TajikBlocks" data-panel="blocks"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="8" height="8"/><rect x="12" y="12" width="8" height="8"/></svg></button>
       <button class="activity-button settings" title="Танзимот"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/></svg></button>
     </nav>
     <aside class="sidebar">
-      <div class="sidebar-head"><span>ФАЙЛҲО</span><div><button id="new-file" title="Файли нав">+</button><button id="open-file" title="Кушодан">↗</button></div></div>
-      <div class="folder-title"><span class="chevron">⌄</span> ЛОИҲАИ КУШОДА</div>
-      <div id="file-list" class="file-list"><button class="file active"><span class="file-dot"></span><span id="file-name">барномаи нав.tj</span></button></div>
-      <div class="next-note"><strong>TajikLang Next</strong><span>Дода, нишон ва блокҳои равшан</span><a href="#">Дастурро бинед</a></div>
+      <div class="sidebar-head"><span id="sidebar-title">ФАЙЛҲО</span><div><button id="new-file" title="Файли нав">+</button><button id="open-file" title="Кушодан">↗</button><button id="open-project" title="Кушодани папка">▣</button></div></div>
+      <div id="sidebar-content">
+        <div class="folder-title"><span class="chevron">⌄</span> <span id="project-name">ЛОИҲАИ КУШОДА</span></div>
+        <div id="file-list" class="file-list"><button class="file active"><span class="file-dot"></span><span id="file-name">барномаи нав.tj</span></button></div>
+        <div class="next-note"><strong>TajikLang Next</strong><span>Дода, нишон ва блокҳои равшан</span><a href="https://github.com/BahromPython/tajiklang-2.0.0/blob/main/docs/TAJIKLANG_NEXT.md">Дастурро бинед</a></div>
+      </div>
     </aside>
     <section class="editor-zone">
       <div class="tabs"><button class="tab active"><span class="tab-indicator"></span><span id="tab-name">барномаи нав.tj</span><span class="tab-close">×</span></button><button class="add-tab" title="Файли нав">+</button></div>

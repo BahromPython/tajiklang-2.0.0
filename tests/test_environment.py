@@ -46,6 +46,23 @@ class TestProjectEnvironment(unittest.TestCase):
             os.chdir(old)
         self.assertTrue((self.root / "аз_cli" / ".tajiklang" / "лоиҳа.json").is_file())
 
+    def test_v3_templates_create_a_runnable_project(self):
+        project = environment.create_project("сомона", self.root, kind="web")
+        source = (project / "барнома.tj").read_text(encoding="utf-8")
+        self.assertIn("ворид саҳифа", source)
+        self.assertIn("Сомонаи интерактивӣ", (project / "README.md").read_text(encoding="utf-8"))
+
+    def test_cli_init_creates_a_named_template(self):
+        old = Path.cwd()
+        try:
+            os.chdir(self.root)
+            with redirect_stdout(io.StringIO()):
+                self.assertEqual(main(["init", "blocks", "блокҳои_ман"]), 0)
+        finally:
+            os.chdir(old)
+        source = (self.root / "блокҳои_ман" / "барнома.tj").read_text(encoding="utf-8")
+        self.assertIn("TajikBlocks", source)
+
     def test_a_project_library_wins_over_the_global_library(self):
         project = environment.create_project("лоиҳа", self.root)
         local = project / ".tajiklang" / "китобхона" / "асбоб"

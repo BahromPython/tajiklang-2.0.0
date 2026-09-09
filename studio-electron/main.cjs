@@ -4,6 +4,7 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 
 let window;
+const PROJECT_FILE_LIMIT = 180;
 
 function fileArgument(arguments_) {
   return arguments_.find(argument => argument.toLowerCase().endsWith(".tj"));
@@ -41,18 +42,44 @@ function runtime() {
     : { command: "python3", args: [path.join(__dirname, "..", "main.py")] };
 }
 
-function execute(source, currentPath) {
-  return new Promise(async (resolve) => {
-    const file = currentPath || path.join(app.getPath("temp"), `tajiklang-${Date.now()}.tj`);
-    await fs.writeFile(file, source, "utf8");
+function runRuntime(arguments_, cwd) {
+  return new Promise(resolve => {
     const runner = runtime();
-    const child = spawn(runner.command, [...runner.args, file], { windowsHide: true });
+    const child = spawn(runner.command, [...runner.args, ...arguments_], { windowsHide: true, cwd });
     let output = "", errors = "";
     child.stdout.on("data", data => output += data);
     child.stderr.on("data", data => errors += data);
     child.on("error", error => resolve({ ok: false, output: "", error: `Муҳаррики TajikLang оғоз нашуд: ${error.message}` }));
     child.on("close", code => resolve({ ok: code === 0, output, error: errors }));
   });
+}
+
+function execute(source, currentPath, mode = "run") {
+  return new Promise(async (resolve) => {
+    const file = currentPath || path.join(app.getPath("temp"), `tajiklang-${Date.now()}.tj`);
+    await fs.writeFile(file, source, "utf8");
+    const args = mode === "check" ? ["--санҷиш", file] : [file];
+    resolve(await runRuntime(args, path.dirname(file)));
+  });
+}
+
+async function projectFiles(folder, prefix = "", state = { count: 0, depth: 0 }) {
+  if (state.depth > 5 || state.count >= PROJECT_FILE_LIMIT) return [];
+  const entries = await fs.readdir(folder, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "dist") continue;
+    const relative = path.join(prefix, entry.name);
+    const absolute = path.join(folder, entry.name);
+    if (entry.isDirectory()) {
+      const children = await projectFiles(absolute, relative, { count: state.count, depth: state.depth + 1 });
+      state.count += children.length;
+      if (children.length) files.push({ type: "folder", name: entry.name, path: absolute, children });
+    } else if (/\.(tj|md|json|txt|html|css)$/iu.test(entry.name) && state.count++ < PROJECT_FILE_LIMIT) {
+      files.push({ type: "file", name: entry.name, path: absolute, relative });
+    }
+  }
+  return files;
 }
 
 app.whenReady().then(() => {
@@ -65,6 +92,15 @@ app.whenReady().then(() => {
     const filePath = result.filePaths[0];
     return { path: filePath, name: path.basename(filePath), source: await fs.readFile(filePath, "utf8") };
   });
+  ipcMain.handle("project:open", async () => {
+    const result = await dialog.showOpenDialog(window, { properties: ["openDirectory"] });
+    if (result.canceled) return null;
+    const root = result.filePaths[0];
+    return { path: root, name: path.basename(root), files: await projectFiles(root) };
+  });
+  ipcMain.handle("file:read", async (_event, filePath) => ({
+    path: filePath, name: path.basename(filePath), source: await fs.readFile(filePath, "utf8")
+  }));
   ipcMain.handle("file:save", async (_event, value) => {
     let filePath = value.path;
     if (!filePath) {
@@ -76,6 +112,8 @@ app.whenReady().then(() => {
     return { path: filePath, name: path.basename(filePath) };
   });
   ipcMain.handle("program:run", (_event, value) => execute(value.source, value.path));
+  ipcMain.handle("program:check", (_event, value) => execute(value.source, value.path, "check"));
+  ipcMain.handle("packages:list", (_event, value) => runRuntime(["ҷустуҷӯ"], value?.projectPath || app.getPath("home")));
   app.on("second-instance", (_event, arguments_) => {
     if (window.isMinimized()) window.restore();
     window.focus();

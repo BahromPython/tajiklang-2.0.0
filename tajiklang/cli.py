@@ -53,6 +53,7 @@ USAGE = """TajikLang {version}
 
 Муҳит:
     tajik лоиҳа нав <ном>      лоиҳа бо муҳити худаш месозад
+    tajik init <навъ> <ном>    лоиҳаи навро аз қолаб месозад
     tajik муҳит соз [папка]    ба папка муҳити маҳаллӣ медиҳад
 
 TajikBlocks ва localhost:
@@ -323,6 +324,26 @@ def environment_command(args: list[str]) -> int:
         return EX_DATAERR
 
 
+def init_command(args: list[str]) -> int:
+    """Create a v3 project from an explicit, discoverable template."""
+    from . import environment
+
+    if len(args) != 2:
+        kinds = ", ".join(environment.PROJECT_KINDS)
+        print(f"Истифода: tajik init <навъ> <ном>\nНавъҳо: {kinds}", file=sys.stderr)
+        return EX_USAGE
+    kind, name = args
+    try:
+        project = environment.create_project(name, kind=kind)
+    except environment.EnvironmentError as error:
+        print(error, file=sys.stderr)
+        return EX_DATAERR
+    print(f"✓ Лоиҳаи «{project.name}» сохта шуд: {environment.PROJECT_KINDS[kind]}.")
+    print(f"  Файл: {project / environment.MAIN_FILE}")
+    print("  Дар Studio папкаро кушоед ва ▶ Иҷро-ро пахш кунед.")
+    return 0
+
+
 def blocks_command(args: list[str]) -> int:
     if args:
         print("Истифода: tajik блокҳо", file=sys.stderr)
@@ -437,6 +458,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args and args[0] in ("лоиҳа", "муҳит"):
         return environment_command(args[1:])
+
+    if args and args[0] == "init":
+        return init_command(args[1:])
 
     if args and args[0] in ("блокҳо", "blocks"):
         return blocks_command(args[1:])
