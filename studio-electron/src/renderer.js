@@ -24,4 +24,6 @@ document.querySelector("#run").addEventListener("click", run);
 document.querySelector("#activity-run").addEventListener("click", run);
 document.querySelector("#check").addEventListener("click", () => { output.textContent = "Санҷиш ҳангоми иҷро анҷом меёбад."; setStatus("Омода барои санҷиш"); });
 document.addEventListener("keydown", event => { if (event.key === "F5") { event.preventDefault(); run(); } if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") { event.preventDefault(); save(); } if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "o") { event.preventDefault(); document.querySelector("#open-file").click(); } });
+window.studio.onExternalFile(setFile);
+window.studio.onError(message => { output.textContent = message; output.classList.add("error"); setStatus("Хато"); });
 refreshLines();

@@ -11,7 +11,7 @@ from .interpreter import Interpreter
 from .lexer import Lexer
 from .parser import Parser
 
-__version__ = "2.2.1"
+__version__ = "2.2.2"
 
 __all__ = [
     "Lexer",

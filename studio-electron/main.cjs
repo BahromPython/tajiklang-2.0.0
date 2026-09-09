@@ -5,6 +5,21 @@ const path = require("node:path");
 
 let window;
 
+function fileArgument(arguments_) {
+  return arguments_.find(argument => argument.toLowerCase().endsWith(".tj"));
+}
+
+async function openFromSystem(filePath) {
+  if (!filePath || !window) return;
+  try {
+    const resolved = path.resolve(filePath);
+    const source = await fs.readFile(resolved, "utf8");
+    window.webContents.send("file:external", { path: resolved, name: path.basename(resolved), source });
+  } catch (error) {
+    window.webContents.send("studio:error", `Файл кушода нашуд: ${error.message}`);
+  }
+}
+
 function createWindow() {
   window = new BrowserWindow({
     width: 1440, height: 900, minWidth: 960, minHeight: 650,
@@ -13,6 +28,7 @@ function createWindow() {
     webPreferences: { preload: path.join(__dirname, "preload.cjs"), contextIsolation: true, nodeIntegration: false }
   });
   window.loadFile(path.join(__dirname, "src", "index.html"));
+  window.webContents.once("did-finish-load", () => openFromSystem(fileArgument(process.argv)));
 }
 
 function runtime() {
@@ -40,6 +56,8 @@ function execute(source, currentPath) {
 }
 
 app.whenReady().then(() => {
+  const singleInstance = app.requestSingleInstanceLock();
+  if (!singleInstance) { app.quit(); return; }
   createWindow();
   ipcMain.handle("file:open", async () => {
     const result = await dialog.showOpenDialog(window, { properties: ["openFile"], filters: [{ name: "TajikLang", extensions: ["tj"] }] });
@@ -58,6 +76,11 @@ app.whenReady().then(() => {
     return { path: filePath, name: path.basename(filePath) };
   });
   ipcMain.handle("program:run", (_event, value) => execute(value.source, value.path));
+  app.on("second-instance", (_event, arguments_) => {
+    if (window.isMinimized()) window.restore();
+    window.focus();
+    openFromSystem(fileArgument(arguments_));
+  });
   app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
 app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });

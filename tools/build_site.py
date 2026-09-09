@@ -506,6 +506,9 @@ def install_page(f: dict[str, str]) -> str:
   </ol>
 
   <p class="quiet">Барои нест кардан: Settings → Apps → TajikLang → Uninstall.</p>
+  <p class="quiet"><strong>Ду роҳ барои кор:</strong> файли <code>.tj</code>-ро ду клик кунед,
+     то дар TajikLang Studio кушояд; ё дар Command Prompt / PowerShell нависед
+     <code>tajik барнома.tj</code>, то онро рост иҷро кунед.</p>
 </section>
 
 <section>

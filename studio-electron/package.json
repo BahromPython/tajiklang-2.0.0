@@ -1,6 +1,6 @@
 {
   "name": "tajiklang-studio",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "private": true,
   "description": "TajikLang Studio — Electron workbench",
   "main": "main.cjs",
@@ -18,7 +18,9 @@
     "directories": { "output": "release" },
     "files": ["**/*", "!release"],
     "extraResources": [{ "from": "../dist/TajikLang", "to": "runtime", "filter": ["**/*"] }],
+    "fileAssociations": [{ "ext": "tj", "name": "TajikLang Program", "description": "Барномаи TajikLang", "role": "Editor" }],
     "win": { "target": "nsis", "icon": "assets/tajiklang.ico" },
+    "nsis": { "oneClick": false, "perMachine": false, "allowToChangeInstallationDirectory": true, "include": "installer.nsh" },
     "mac": { "target": "dmg" },
     "linux": { "target": "AppImage" }
   }
