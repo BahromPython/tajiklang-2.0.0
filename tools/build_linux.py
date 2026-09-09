@@ -39,12 +39,12 @@ def main() -> int:
         print("Ҳоло танҳо Linux x86_64 дастгирӣ мешавад.", file=sys.stderr)
         return 2
 
-    for path in (BUILD, DIST / "TajikLang-linux-x86_64"):
+    for path in (BUILD, DIST / "TajikLang"):
         if path.exists():
             shutil.rmtree(path)
     BUILD.mkdir(parents=True, exist_ok=True)
     DIST.mkdir(exist_ok=True)
-    staging = DIST / "TajikLang-linux-x86_64"
+    staging = DIST / "TajikLang"
 
     if build("tajik", ROOT / "main.py", windowed=False, dist=BUILD / "cli"):
         return 1

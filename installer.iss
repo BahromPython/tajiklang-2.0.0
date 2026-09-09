@@ -2,7 +2,7 @@
 ; Students download one .exe, click Install, and get a desktop shortcut.
 
 #ifndef AppVersion
-  #define AppVersion "2.1.5"
+  #define AppVersion "2.2.0"
 #endif
 #ifndef AppArch
   #define AppArch "x64"

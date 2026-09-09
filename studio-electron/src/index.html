@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="tg">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TajikLang Studio</title><link rel="stylesheet" href="styles.css"></head>
+<body>
+  <header class="titlebar">
+    <div class="brand"><span class="brand-mark">Т</span><span>TajikLang Studio</span></div>
+    <label class="command"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg><input id="project-search" placeholder="Ҷустуҷӯ дар лоиҳа"></label>
+    <div class="title-actions"><span id="save-state">Омода</span><button class="window-action" aria-label="Панели фармон">•••</button></div>
+  </header>
+  <main class="workbench">
+    <nav class="activity" aria-label="Навигатсияи Studio">
+      <button class="activity-button active" title="Файлҳо" data-panel="files"><svg viewBox="0 0 24 24"><path d="M5 3h9l4 4v14H5z"/><path d="M14 3v5h4"/></svg></button>
+      <button class="activity-button" title="Ҷустуҷӯ" data-panel="search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+      <button class="activity-button" title="Бастаҳо" data-panel="packages"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg></button>
+      <button class="activity-button" title="Иҷро" id="activity-run"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg></button>
+      <button class="activity-button" title="TajikBlocks"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="8" height="8"/><rect x="12" y="12" width="8" height="8"/></svg></button>
+      <button class="activity-button settings" title="Танзимот"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/></svg></button>
+    </nav>
+    <aside class="sidebar">
+      <div class="sidebar-head"><span>ФАЙЛҲО</span><div><button id="new-file" title="Файли нав">+</button><button id="open-file" title="Кушодан">↗</button></div></div>
+      <div class="folder-title"><span class="chevron">⌄</span> ЛОИҲАИ КУШОДА</div>
+      <div id="file-list" class="file-list"><button class="file active"><span class="file-dot"></span><span id="file-name">барномаи нав.tj</span></button></div>
+      <div class="next-note"><strong>TajikLang Next</strong><span>Дода, нишон ва блокҳои равшан</span><a href="#">Дастурро бинед</a></div>
+    </aside>
+    <section class="editor-zone">
+      <div class="tabs"><button class="tab active"><span class="tab-indicator"></span><span id="tab-name">барномаи нав.tj</span><span class="tab-close">×</span></button><button class="add-tab" title="Файли нав">+</button></div>
+      <div class="editor-toolbar"><div id="breadcrumb">ЛОИҲА <span>›</span> мисолҳо <span>›</span> барномаи нав.tj</div><div class="toolbar-actions"><button id="check">Санҷиш</button><button class="run" id="run">Иҷро <kbd>F5</kbd></button></div></div>
+      <div class="editor-frame"><div id="line-numbers" aria-hidden="true"></div><textarea id="editor" spellcheck="false"># TajikLang Next
+дода ном &lt;- "Баҳром"
+дода синну &lt;- 16
+
+нишон "Салом", ном
+
+агар синну &gt;= 16 {
+    нишон "Ба TajikLang Studio хуш омадед"
+} дигар {
+    нишон "Омӯзишро идома диҳед"
+}</textarea><div class="minimap" aria-hidden="true"></div></div>
+      <section class="bottom-panel"><div class="panel-tabs"><button class="panel-tab active" data-output="output">Натиҷа</button><button class="panel-tab" data-output="problems">Хатоҳо <span id="problem-count"></span></button><button class="panel-tab" data-output="input">Воридот</button><button class="panel-close">×</button></div><pre id="output" class="console">Барои иҷрои барнома F5-ро пахш кунед.</pre></section>
+    </section>
+  </main>
+  <footer class="statusbar"><span id="status">Омода</span><span>UTF-8</span><span>TajikLang Next</span><span>Spaces: 4</span></footer>
+  <script src="renderer.js"></script>
+</body></html>

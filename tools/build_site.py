@@ -26,11 +26,11 @@ REPO = "https://github.com/BahromPython/tajiklang-2.0.0"
 # Netlify hosts the public site; GitHub Releases host the signed-by-checksum
 # platform artifacts.  This stable link always selects the newest Windows
 # x64 installer, which is the right choice for nearly every student.
-DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-Setup-Windows-x64.exe"
+DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-Studio-Setup-Windows-x64.exe"
 RELEASES = f"{REPO}/releases/latest"
-MAC_INTEL = f"{REPO}/releases/latest/download/TajikLang-macos-x86_64.pkg"
-MAC_APPLE = f"{REPO}/releases/latest/download/TajikLang-macos-arm64.pkg"
-LINUX = f"{REPO}/releases/latest/download/TajikLang-linux-x86_64.tar.gz"
+MAC_INTEL = f"{REPO}/releases/latest/download/TajikLang-Studio-macos-x86_64.dmg"
+MAC_APPLE = f"{REPO}/releases/latest/download/TajikLang-Studio-macos-arm64.dmg"
+LINUX = f"{REPO}/releases/latest/download/TajikLang-Studio-linux-x86_64.AppImage"
 
 sys.path.insert(0, str(ROOT))
 
@@ -473,9 +473,9 @@ def install_page(f: dict[str, str]) -> str:
   </div>
 
   <div class="cards" style="margin-top:18px">
-    <div class="card"><h3>macOS — Intel</h3><p>Барои Mac-ҳои Intel. Насбкунандаи <code>.pkg</code>.</p><p><a href="{MAC_INTEL}">⬇ Зеркашӣ барои Mac Intel</a></p></div>
-    <div class="card"><h3>macOS — Apple Silicon</h3><p>Барои MacBook-ҳои M1, M2, M3 ва M4. Насбкунандаи <code>.pkg</code>.</p><p><a href="{MAC_APPLE}">⬇ Зеркашӣ барои Apple Silicon</a></p></div>
-    <div class="card"><h3>Linux — 64-bit</h3><p>Барои Ubuntu, Debian, Fedora ва дигар Linux-ҳои 64-bit. Бастаи <code>.tar.gz</code>.</p><p><a href="{LINUX}">⬇ Зеркашӣ барои Linux</a></p></div>
+    <div class="card"><h3>macOS — Intel</h3><p>Барои Mac-ҳои Intel. Барномаи Electron дар <code>.dmg</code>.</p><p><a href="{MAC_INTEL}">⬇ Зеркашӣ барои Mac Intel</a></p></div>
+    <div class="card"><h3>macOS — Apple Silicon</h3><p>Барои MacBook-ҳои M1, M2, M3 ва M4. Барномаи Electron дар <code>.dmg</code>.</p><p><a href="{MAC_APPLE}">⬇ Зеркашӣ барои Apple Silicon</a></p></div>
+    <div class="card"><h3>Linux — 64-bit</h3><p>Барномаи мустақили Electron барои Linux. Файли <code>.AppImage</code>-ро иҷозаи иҷро диҳед.</p><p><a href="{LINUX}">⬇ Зеркашӣ барои Linux</a></p></div>
   </div>
   <p class="quiet">Linux аз нашри навбатии 2.1.4 дастрас мешавад. Барои ҳамаи нусхаҳо саҳифаи <a href="{RELEASES}">релизҳо</a>-ро бинед.</p>
 </header>

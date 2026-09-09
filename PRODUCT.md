@@ -31,9 +31,10 @@ read output and beginner-friendly errors without using a terminal.
 
 ## Capabilities and Constraints
 
-The Studio is a Tkinter desktop application packaged with PyInstaller. It must
-remain fast, keyboard-friendly, Unicode-safe for Tajik Cyrillic, readable on
-school computers, and usable without a Python installation.
+The Studio is migrating from Tkinter to an Electron desktop shell, with a
+packaged TajikLang runtime behind a secure IPC bridge. It must remain fast,
+keyboard-friendly, Unicode-safe for Tajik Cyrillic, readable on school
+computers, and usable without a Python installation.
 
 ## Brand Commitments
 

@@ -28,17 +28,22 @@ jobs:
           architecture: ${{ matrix.python_arch }}
       - run: python -m pip install --upgrade pip pyinstaller
       - run: python tools/build_exe.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - working-directory: studio-electron
+        run: npm install
+      - working-directory: studio-electron
+        run: npx electron-builder --win nsis --${{ matrix.label == 'x86' && 'ia32' || 'x64' }}
       - shell: pwsh
         run: |
-          choco install innosetup --no-progress --yes
-          $version = "${{ github.ref_name }}".TrimStart("v")
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DAppVersion=$version" "/DAppArch=${{ matrix.label }}" installer.iss
           Move-Item dist/TajikLang-windows.zip "dist/TajikLang-windows-${{ matrix.label }}.zip"
+          Move-Item "studio-electron/release/*.exe" "dist/TajikLang-Studio-Setup-Windows-${{ matrix.label }}.exe"
       - uses: actions/upload-artifact@v4
         with:
           name: TajikLang-windows-${{ matrix.label }}
           path: |
-            dist/TajikLang-Setup-Windows-${{ matrix.label }}.exe
+            dist/TajikLang-Studio-Setup-Windows-${{ matrix.label }}.exe
             dist/TajikLang-windows-${{ matrix.label }}.zip
 
   macos:
@@ -64,12 +69,23 @@ jobs:
         env:
           TAJIKLANG_ARCH: ${{ matrix.arch }}
           TAJIKLANG_VERSION: ${{ github.ref_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - working-directory: studio-electron
+        run: npm install
+      - working-directory: studio-electron
+        run: npx electron-builder --mac dmg --${{ matrix.arch == 'arm64' && 'arm64' || 'x64' }}
+      - shell: bash
+        run: |
+          mv "studio-electron/release/"*.dmg "dist/TajikLang-Studio-macos-${{ matrix.arch }}.dmg"
       - uses: actions/upload-artifact@v4
         with:
           name: TajikLang-macos-${{ matrix.label }}
           path: |
             dist/TajikLang-macos-${{ matrix.arch }}.zip
             dist/TajikLang-macos-${{ matrix.arch }}.pkg
+            dist/TajikLang-Studio-macos-${{ matrix.arch }}.dmg
 
   linux:
     name: Linux x64
@@ -82,10 +98,21 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y python3-tk
       - run: python -m pip install --upgrade pip pyinstaller
       - run: python tools/build_linux.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - working-directory: studio-electron
+        run: npm install
+      - working-directory: studio-electron
+        run: npx electron-builder --linux AppImage --x64
+      - shell: bash
+        run: mv studio-electron/release/*.AppImage dist/TajikLang-Studio-linux-x86_64.AppImage
       - uses: actions/upload-artifact@v4
         with:
           name: TajikLang-linux-x64
-          path: dist/TajikLang-linux-x86_64.tar.gz
+          path: |
+            dist/TajikLang-linux-x86_64.tar.gz
+            dist/TajikLang-Studio-linux-x86_64.AppImage
 
   publish:
     name: Publish GitHub release

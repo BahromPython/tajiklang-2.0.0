@@ -17,6 +17,7 @@ import unicodedata
 from decimal import Decimal
 
 from .errors import LexerError
+from .syntax_next import normalize as normalize_next_syntax
 from .tokens import (
     KEYWORD_TOKENS,
     KEYWORD_VERSIONS,
@@ -60,6 +61,10 @@ class Lexer:
         # They look identical on screen. Without this line, `ҳарорат` typed on
         # one keyboard would be a *different variable* from `ҳарорат` typed on
         # another, and nobody would ever work out why.
+        try:
+            source = normalize_next_syntax(source)
+        except ValueError as error:
+            raise LexerError(str(error), 1, 1, source.splitlines()[0] if source else "") from error
         self.source = unicodedata.normalize("NFC", source)
         self.filename = filename
         self.lines = self.source.splitlines()
