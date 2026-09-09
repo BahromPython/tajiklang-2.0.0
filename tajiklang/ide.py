@@ -43,21 +43,21 @@ from .parser import Parser
 
 # --- colouring --------------------------------------------------------------
 THEME = {
-    "bg": "#0b1020",
-    "panel": "#111a2d",
-    "panel_raised": "#17233a",
-    "line": "#263650",
-    "ink": "#edf3fb",
-    "soft": "#9baac0",
-    "keyword": "#86c5ff",
-    "builtin": "#d2b6ff",
-    "string": "#9be4a8",
-    "number": "#ffd084",
-    "comment": "#728198",
-    "error": "#ff9a9a",
-    "warning": "#ffd084",
-    "accent": "#3dd6a3",
-    "accent_dark": "#123f36",
+    "bg": "#10131c",
+    "panel": "#181c27",
+    "panel_raised": "#202634",
+    "line": "#30394b",
+    "ink": "#f4f7fb",
+    "soft": "#aeb9c9",
+    "keyword": "#8ac5ff",
+    "builtin": "#cbb6ff",
+    "string": "#8ee6bf",
+    "number": "#ffcc80",
+    "comment": "#8491a4",
+    "error": "#ff9eaa",
+    "warning": "#ffc46b",
+    "accent": "#36b890",
+    "accent_dark": "#173f39",
 }
 
 
@@ -104,14 +104,45 @@ class IDE:
 
     def _button(self, parent, label: str, command, *, primary: bool = False) -> None:
         background = THEME["accent"] if primary else THEME["panel_raised"]
-        foreground = "#06241c" if primary else THEME["ink"]
-        active = "#67e7bd" if primary else THEME["line"]
+        foreground = "#062b23" if primary else THEME["ink"]
+        active = "#69d5b6" if primary else "#2a3242"
         tk.Button(
-            parent, text=label, command=command, font=("Segoe UI", 10, "bold"),
+            parent, text=label, command=command, font=("Segoe UI", 9, "bold"),
             relief="flat", bg=background, fg=foreground, activebackground=active,
-            activeforeground=foreground, padx=13, pady=8, cursor="hand2",
+            activeforeground=foreground, padx=10, pady=5, cursor="hand2",
             borderwidth=0, highlightthickness=0,
         ).pack(side="left", padx=(0, 7))
+
+    def _activity_button(self, parent, kind: str, command, *, active: bool = False) -> None:
+        """Draw a compact, consistent line icon instead of platform glyphs."""
+        bg = "#202a39" if active else "#11151e"
+        canvas = tk.Canvas(parent, width=48, height=48, bg=bg, highlightthickness=0,
+                           cursor="hand2", borderwidth=0)
+        colour = THEME["accent"] if active else "#aeb9c9"
+        if active:
+            canvas.create_rectangle(0, 9, 2, 39, fill=THEME["accent"], outline="")
+        if kind == "files":
+            canvas.create_rectangle(16, 13, 32, 34, outline=colour, width=2)
+            canvas.create_line(21, 13, 21, 18, 27, 18, 27, 13, fill=colour, width=2)
+        elif kind == "search":
+            canvas.create_oval(15, 14, 29, 28, outline=colour, width=2)
+            canvas.create_line(27, 27, 34, 34, fill=colour, width=2)
+        elif kind == "source":
+            canvas.create_line(15, 15, 24, 24, 15, 33, fill=colour, width=2)
+            canvas.create_line(33, 15, 24, 24, 33, 33, fill=colour, width=2)
+        elif kind == "run":
+            canvas.create_polygon(18, 14, 34, 24, 18, 34, outline=colour, fill="", width=2)
+        elif kind == "blocks":
+            canvas.create_rectangle(15, 15, 25, 25, outline=colour, width=2)
+            canvas.create_rectangle(23, 23, 33, 33, outline=colour, width=2)
+        elif kind == "settings":
+            canvas.create_oval(17, 17, 31, 31, outline=colour, width=2)
+            for x1, y1, x2, y2 in ((24, 12, 24, 17), (24, 31, 24, 36), (12, 24, 17, 24), (31, 24, 36, 24)):
+                canvas.create_line(x1, y1, x2, y2, fill=colour, width=2)
+        canvas.bind("<Button-1>", lambda _event: command())
+        canvas.bind("<Enter>", lambda _event: canvas.configure(bg="#242b3a"))
+        canvas.bind("<Leave>", lambda _event: canvas.configure(bg=bg))
+        canvas.pack(fill="x")
 
     def _build_layout(self) -> None:
         mono = tkfont.Font(family="Cascadia Code", size=12)
@@ -128,35 +159,34 @@ class IDE:
 
         # A familiar professional workbench: command bar, activity rail,
         # Explorer, editor tab/breadcrumb, bottom panel and status bar.
-        command_bar = tk.Frame(self.root, bg="#101828", height=38)
+        command_bar = tk.Frame(self.root, bg="#11151e", height=42)
         command_bar.pack(fill="x")
         command_bar.pack_propagate(False)
-        tk.Label(command_bar, text="Т", font=("Segoe UI", 13, "bold"), width=3,
-                 bg="#101828", fg=THEME["accent"]).pack(side="left")
+        tk.Label(command_bar, text="Т", font=("Segoe UI", 14, "bold"), width=3,
+                 bg="#11151e", fg=THEME["accent"]).pack(side="left")
         tk.Label(command_bar, text="TajikLang Studio", font=("Segoe UI", 9, "bold"),
-                 bg="#101828", fg=THEME["ink"]).pack(side="left", padx=(3, 28))
+                 bg="#11151e", fg=THEME["ink"]).pack(side="left", padx=(3, 32))
         search = tk.Entry(command_bar, font=("Segoe UI", 9), relief="flat",
-                          bg="#1b2940", fg=THEME["soft"], insertbackground=THEME["ink"])
+                          bg="#202634", fg=THEME["soft"], insertbackground=THEME["ink"])
         search.insert(0, "Ҷустуҷӯ дар лоиҳа")
-        search.pack(side="left", fill="x", expand=True, padx=(0, 28), pady=7, ipady=2)
-        tk.Label(command_bar, text="◌  ◫  □", font=("Segoe UI", 10), bg="#101828",
-                 fg=THEME["soft"]).pack(side="right", padx=14)
+        search.pack(side="left", fill="x", expand=True, padx=(0, 28), pady=8, ipady=3)
+        tk.Label(command_bar, text="Насбшуда", font=("Segoe UI", 8), bg="#11151e",
+                 fg=THEME["soft"]).pack(side="right", padx=15)
 
         body = tk.Frame(self.root, bg=THEME["line"])
         body.pack(fill="both", expand=True)
 
-        activity = tk.Frame(body, bg="#101828", width=48)
+        activity = tk.Frame(body, bg="#11151e", width=48)
         activity.pack(side="left", fill="y")
         activity.pack_propagate(False)
-        for label, command in (("▤", self._refresh_files), ("⌕", self.open_dialog),
-                               ("⑂", self.show_packages), ("▷", self.run),
-                               ("▧", self.open_blocks)):
-            tk.Button(activity, text=label, command=command, font=("Segoe UI Symbol", 18),
-                      relief="flat", bg="#101828", fg=THEME["soft"],
-                      activebackground="#1b2940", activeforeground=THEME["accent"],
-                      borderwidth=0, cursor="hand2", pady=10).pack(fill="x")
-        tk.Label(activity, text="⚙", font=("Segoe UI Symbol", 16), bg="#101828",
-                 fg=THEME["soft"]).pack(side="bottom", pady=10)
+        self._activity_button(activity, "files", self._refresh_files, active=True)
+        self._activity_button(activity, "search", self.open_dialog)
+        self._activity_button(activity, "source", self.show_packages)
+        self._activity_button(activity, "run", self.run)
+        self._activity_button(activity, "blocks", self.open_blocks)
+        settings = tk.Frame(activity, bg="#11151e")
+        settings.pack(side="bottom", fill="x")
+        self._activity_button(settings, "settings", lambda: self._say("Танзимот ба зудӣ меояд"))
 
         files_frame = tk.Frame(body, bg=THEME["panel"], width=250)
         files_frame.pack(side="left", fill="y")
@@ -182,18 +212,19 @@ class IDE:
         left.pack(side="left", fill="both", expand=True)
         editor_shell = tk.Frame(left, bg=THEME["bg"])
         left.add(editor_shell, stretch="always", height=460)
-        tabs = tk.Frame(editor_shell, bg=THEME["panel"], height=36)
+        tabs = tk.Frame(editor_shell, bg=THEME["panel"], height=38)
         tabs.pack(fill="x")
         tabs.pack_propagate(False)
-        tk.Label(tabs, text="  ◆  барномаи нав.tj    ×", font=("Segoe UI", 9),
-                 bg=THEME["bg"], fg=THEME["ink"], padx=12, pady=9).pack(side="left")
+        self.tab_label = tk.Label(tabs, text="барномаи нав.tj     ×", font=("Segoe UI", 9),
+                                  bg=THEME["bg"], fg=THEME["ink"], padx=16, pady=10)
+        self.tab_label.pack(side="left")
         actions = tk.Frame(tabs, bg=THEME["panel"])
         actions.pack(side="right", padx=7, pady=4)
-        self._button(actions, "▶ Иҷро", self.run, primary=True)
-        self._button(actions, "✓ Санҷиш", self.check)
-        breadcrumb = tk.Label(editor_shell, text="  ЛОИҲА  ›  мисолҳо  ›  барномаи нав.tj",
-                              anchor="w", font=("Segoe UI", 8), bg=THEME["bg"], fg=THEME["soft"], pady=5)
-        breadcrumb.pack(fill="x")
+        self._button(actions, "Иҷро", self.run, primary=True)
+        self._button(actions, "Санҷиш", self.check)
+        self.breadcrumb = tk.Label(editor_shell, text="  ЛОИҲА  ›  мисолҳо  ›  барномаи нав.tj",
+                                   anchor="w", font=("Segoe UI", 8), bg=THEME["bg"], fg=THEME["soft"], pady=5)
+        self.breadcrumb.pack(fill="x")
         editor_frame = tk.Frame(editor_shell, bg=THEME["bg"])
         editor_frame.pack(fill="both", expand=True)
 
@@ -246,7 +277,7 @@ class IDE:
         status_bar = tk.Frame(self.root, bg="#0d8270", height=23)
         status_bar.pack(fill="x")
         status_bar.pack_propagate(False)
-        self.status = tk.Label(status_bar, text="✓ Омода", font=("Segoe UI", 8),
+        self.status = tk.Label(status_bar, text="Омода", font=("Segoe UI", 8),
                                bg="#0d8270", fg="#e8fffb", padx=9)
         self.status.pack(side="left")
         tk.Label(status_bar, text="TajikLang   UTF-8   .tj", font=("Segoe UI", 8),
@@ -335,6 +366,8 @@ class IDE:
         self.editor.insert("1.0", path.read_text(encoding="utf-8"))
         self.path = path
         self.folder = path.parent
+        self.tab_label.configure(text=f"{path.name}     ×")
+        self.breadcrumb.configure(text=f"  ЛОИҲА  ›  {path.parent.name}  ›  {path.name}")
         self.root.title(f"TajikLang Studio — {path.name}")
         self._after_edit()
         self._say(f"Кушода шуд: {path.name}")
@@ -343,6 +376,8 @@ class IDE:
         self.editor.delete("1.0", "end")
         self.editor.insert("1.0", 'навис("Салом Тоҷикистон!")\n')
         self.path = None
+        self.tab_label.configure(text="барномаи нав.tj     ×")
+        self.breadcrumb.configure(text="  ЛОИҲА  ›  файли нав")
         self.root.title(f"TajikLang Studio — файли нав")
         self._after_edit()
 
@@ -366,6 +401,8 @@ class IDE:
             self.folder = self.path.parent
 
         self.path.write_text(self.editor.get("1.0", "end-1c"), encoding="utf-8")
+        self.tab_label.configure(text=f"{self.path.name}     ×")
+        self.breadcrumb.configure(text=f"  ЛОИҲА  ›  {self.path.parent.name}  ›  {self.path.name}")
         self.root.title(f"TajikLang {__version__} — {self.path.name}")
         self._refresh_files()
         self._say(f"Нигоҳ дошта шуд: {self.path.name}")
