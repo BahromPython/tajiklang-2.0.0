@@ -1,10 +1,52 @@
-const { app, BrowserWindow, dialog, ipcMain } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require("electron");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 
 let window;
 const PROJECT_FILE_LIMIT = 180;
+
+function sendMenuAction(action) {
+  if (window && !window.isDestroyed()) window.webContents.send("studio:menu", action);
+}
+
+function installMenu() {
+  const template = [
+    { label: "Файл", submenu: [
+      { label: "Файли нав", accelerator: "Ctrl+N", click: () => sendMenuAction("new") },
+      { label: "Кушодани файл…", accelerator: "Ctrl+O", click: () => sendMenuAction("open") },
+      { label: "Кушодани лоиҳа…", accelerator: "Ctrl+Shift+O", click: () => sendMenuAction("project") },
+      { type: "separator" },
+      { label: "Нигоҳ доштан", accelerator: "Ctrl+S", click: () => sendMenuAction("save") },
+      { type: "separator" },
+      { role: "quit", label: "Баромадан" }
+    ] },
+    { label: "Таҳрир", submenu: [
+      { role: "undo", label: "Бозгашт" }, { role: "redo", label: "Такрор" }, { type: "separator" },
+      { role: "cut", label: "Буридан" }, { role: "copy", label: "Нусха кардан" },
+      { role: "paste", label: "Часпондан" }, { role: "selectAll", label: "Ҳамаро интихоб кардан" }
+    ] },
+    { label: "Намоиш", submenu: [
+      { label: "Файлҳо", accelerator: "Ctrl+Shift+F", click: () => sendMenuAction("files") },
+      { label: "Ҷустуҷӯ", accelerator: "Ctrl+F", click: () => sendMenuAction("search") },
+      { label: "Равшанӣ / торикӣ", click: () => sendMenuAction("theme") },
+      { type: "separator" }, { role: "toggleDevTools", label: "Абзорҳои таҳия" }
+    ] },
+    { label: "Иҷро", submenu: [
+      { label: "Иҷрои барнома", accelerator: "F5", click: () => sendMenuAction("run") },
+      { label: "Санҷиши барнома", accelerator: "F7", click: () => sendMenuAction("check") }
+    ] },
+    { label: "Терминал", submenu: [
+      { label: "Кушодани Tajik terminal", accelerator: "Ctrl+`", click: () => sendMenuAction("terminal") },
+      { label: "TajikLang version", click: () => sendMenuAction("version") }
+    ] },
+    { label: "Кумак", submenu: [
+      { label: "TajikLang Next", click: () => sendMenuAction("help") },
+      { role: "about", label: "Дар бораи TajikLang Studio" }
+    ] }
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
 
 function fileArgument(arguments_) {
   return arguments_.find(argument => argument.toLowerCase().endsWith(".tj"));
@@ -24,7 +66,7 @@ async function openFromSystem(filePath) {
 function createWindow() {
   window = new BrowserWindow({
     width: 1440, height: 900, minWidth: 960, minHeight: 650,
-    backgroundColor: "#11131a", autoHideMenuBar: true,
+    backgroundColor: "#11131a", autoHideMenuBar: false,
     title: "TajikLang Studio",
     webPreferences: { preload: path.join(__dirname, "preload.cjs"), contextIsolation: true, nodeIntegration: false }
   });
@@ -52,6 +94,12 @@ function runRuntime(arguments_, cwd) {
     child.on("error", error => resolve({ ok: false, output: "", error: `Муҳаррики TajikLang оғоз нашуд: ${error.message}` }));
     child.on("close", code => resolve({ ok: code === 0, output, error: errors }));
   });
+}
+
+function commandArguments(command) {
+  const words = command.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+  if (words[0]?.toLowerCase() === "tajik") words.shift();
+  return words.map(word => word.replace(/^"|"$/g, ""));
 }
 
 function execute(source, currentPath, mode = "run") {
@@ -85,6 +133,7 @@ async function projectFiles(folder, prefix = "", state = { count: 0, depth: 0 })
 app.whenReady().then(() => {
   const singleInstance = app.requestSingleInstanceLock();
   if (!singleInstance) { app.quit(); return; }
+  installMenu();
   createWindow();
   ipcMain.handle("file:open", async () => {
     const result = await dialog.showOpenDialog(window, { properties: ["openFile"], filters: [{ name: "TajikLang", extensions: ["tj"] }] });
@@ -114,6 +163,11 @@ app.whenReady().then(() => {
   ipcMain.handle("program:run", (_event, value) => execute(value.source, value.path));
   ipcMain.handle("program:check", (_event, value) => execute(value.source, value.path, "check"));
   ipcMain.handle("packages:list", (_event, value) => runRuntime(["ҷустуҷӯ"], value?.projectPath || app.getPath("home")));
+  ipcMain.handle("terminal:run", (_event, value) => {
+    const args = commandArguments(value.command || "");
+    if (!args.length) return { ok: true, output: "Tajik terminal омода аст. Мисол: tajik --version", error: "" };
+    return runRuntime(args, value.projectPath || app.getPath("home"));
+  });
   app.on("second-instance", (_event, arguments_) => {
     if (window.isMinimized()) window.restore();
     window.focus();

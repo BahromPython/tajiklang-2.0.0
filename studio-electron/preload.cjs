@@ -8,6 +8,8 @@ contextBridge.exposeInMainWorld("studio", {
   run: value => ipcRenderer.invoke("program:run", value),
   check: value => ipcRenderer.invoke("program:check", value),
   packages: value => ipcRenderer.invoke("packages:list", value),
+  terminal: value => ipcRenderer.invoke("terminal:run", value),
   onExternalFile: callback => ipcRenderer.on("file:external", (_event, file) => callback(file)),
-  onError: callback => ipcRenderer.on("studio:error", (_event, message) => callback(message))
+  onError: callback => ipcRenderer.on("studio:error", (_event, message) => callback(message)),
+  onMenu: callback => ipcRenderer.on("studio:menu", (_event, action) => callback(action))
 });
