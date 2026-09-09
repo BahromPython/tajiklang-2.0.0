@@ -190,6 +190,21 @@ STYLE = """
   .download-card .cta { margin: 20px 0 10px; }
   .download-meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
   .pill { border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; color: var(--soft); font-size: 13px; background: var(--bg); }
+  .platforms { margin-top: 18px; border-top: 1px solid var(--line); }
+  .platform { border-bottom: 1px solid var(--line); }
+  .platform-toggle { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; padding: 17px 4px;
+    border: 0; background: transparent; color: var(--ink); text-align: right; font: inherit; cursor: pointer; }
+  .platform-toggle:hover { color: var(--accent); }
+  .platform-name { font-weight: 700; font-size: 17px; }
+  .platform-caption { display: block; margin-top: 3px; color: var(--soft); font-size: 14px; font-weight: 400; }
+  .platform-arrow { font-size: 20px; color: var(--faint); transition: transform .22s ease; }
+  .platform.active .platform-arrow { transform: rotate(45deg); color: var(--accent); }
+  .platform-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .24s ease; }
+  .platform.active .platform-content { grid-template-rows: 1fr; }
+  .platform-inner { overflow: hidden; }
+  .platform-inner > div { padding: 0 4px 22px; color: var(--soft); }
+  .platform-inner p { margin: 0 0 14px; }
+  .platform-inner .cta { margin: 0; }
 
   .steps { counter-reset: s; padding: 0; list-style: none; }
   .steps li { counter-increment: s; position: relative; padding-right: 42px; margin-bottom: 22px; }
@@ -443,8 +458,8 @@ def install_page(f: dict[str, str]) -> str:
     return (
         HEAD.format(
             title="Насб кардани TajikLang",
-            description="TajikLang-ро дар браузер санҷед ё барои Windows "
-                        "боргирӣ кунед. Ҳеҷ чизи дигар лозим нест.",
+            description="TajikLang-ро дар браузер санҷед ё барои Windows, "
+                        "macOS ва Linux боргирӣ кунед. Ҳеҷ чизи дигар лозим нест.",
             style=STYLE,
         )
         + NAV.format(repo=REPO)
@@ -453,31 +468,35 @@ def install_page(f: dict[str, str]) -> str:
 
 <header>
   <h1>TajikLang-ро<br>ба компютер гиред</h1>
-  <p class="lede">Барои Windows — як боргирӣ, бе Python ва бе насби иловагӣ.
+  <p class="lede">Барои Windows, macOS ё Linux — як боргирӣ, бе Python ва бе насби иловагӣ.
      Тайёр барои синфхона, хона ва лоиҳаҳои ҷиддӣ.</p>
 
-  <div class="download-card">
-    <h2>TajikLang {f['version']} барои Windows</h2>
-    <p class="quiet">Нусхаи пурраи мустақил: забон, муҳаррир, TajikBlocks,
-       муҳити лоиҳаҳо ва намунаҳои омӯзишӣ.</p>
-    <div class="cta">
-      <a class="btn primary" href="{DOWNLOAD}">⬇ Зеркашӣ барои Windows</a>
-      <a class="btn" href="{REPO}">Коди манбаъ</a>
-    </div>
-    <div class="download-meta">
-      <span class="pill">Windows 10 / 11 · 64-bit</span>
-      <span class="pill">Насбкунанда · .exe</span>
-      <span class="pill">Python лозим нест</span>
-      <span class="pill">Версияи {f['version']}</span>
-    </div>
+  <div class="platforms" data-platforms>
+    <article class="platform active">
+      <button class="platform-toggle" type="button" aria-expanded="true"><span><span class="platform-name">Windows</span><span class="platform-caption">Windows 10 / 11 · 64-bit · Насбкунандаи .exe</span></span><span class="platform-arrow">+</span></button>
+      <div class="platform-content"><div class="platform-inner"><div>
+        <p>Нусхаи пурраи мустақил: забон, муҳаррир, TajikBlocks, муҳити лоиҳаҳо ва намунаҳои омӯзишӣ.</p>
+        <div class="cta"><a class="btn primary" href="{DOWNLOAD}">Зеркашӣ барои Windows</a><a class="btn" href="{REPO}">Коди манбаъ</a></div>
+        <div class="download-meta"><span class="pill">Python лозим нест</span><span class="pill">Версияи {f['version']}</span></div>
+      </div></div></div>
+    </article>
+    <article class="platform">
+      <button class="platform-toggle" type="button" aria-expanded="false"><span><span class="platform-name">macOS</span><span class="platform-caption">Intel ё Apple Silicon · Барномаи .dmg</span></span><span class="platform-arrow">+</span></button>
+      <div class="platform-content"><div class="platform-inner"><div>
+        <p>Барои MacBook-ҳои M1, M2, M3 ва M4 версияи Apple Silicon-ро гиред. Барои Mac-ҳои пештара версияи Intel-ро интихоб кунед.</p>
+        <div class="cta"><a class="btn primary" href="{MAC_APPLE}">Apple Silicon</a><a class="btn" href="{MAC_INTEL}">Mac Intel</a></div>
+      </div></div></div>
+    </article>
+    <article class="platform">
+      <button class="platform-toggle" type="button" aria-expanded="false"><span><span class="platform-name">Linux</span><span class="platform-caption">64-bit · Барномаи мустақили AppImage</span></span><span class="platform-arrow">+</span></button>
+      <div class="platform-content"><div class="platform-inner"><div>
+        <p>Барои Ubuntu, Debian, Fedora ва дигар Linux-ҳои 64-bit. Пас аз зеркашӣ ба файл иҷозаи иҷро диҳед.</p>
+        <div class="cta"><a class="btn primary" href="{LINUX}">Зеркашӣ барои Linux</a></div>
+      </div></div></div>
+    </article>
   </div>
-
-  <div class="cards" style="margin-top:18px">
-    <div class="card"><h3>macOS — Intel</h3><p>Барои Mac-ҳои Intel. Барномаи Electron дар <code>.dmg</code>.</p><p><a href="{MAC_INTEL}">⬇ Зеркашӣ барои Mac Intel</a></p></div>
-    <div class="card"><h3>macOS — Apple Silicon</h3><p>Барои MacBook-ҳои M1, M2, M3 ва M4. Барномаи Electron дар <code>.dmg</code>.</p><p><a href="{MAC_APPLE}">⬇ Зеркашӣ барои Apple Silicon</a></p></div>
-    <div class="card"><h3>Linux — 64-bit</h3><p>Барномаи мустақили Electron барои Linux. Файли <code>.AppImage</code>-ро иҷозаи иҷро диҳед.</p><p><a href="{LINUX}">⬇ Зеркашӣ барои Linux</a></p></div>
-  </div>
-  <p class="quiet">Linux аз нашри навбатии 2.1.4 дастрас мешавад. Барои ҳамаи нусхаҳо саҳифаи <a href="{RELEASES}">релизҳо</a>-ро бинед.</p>
+  <p class="quiet">Барои ҳамаи нусхаҳо саҳифаи <a href="{RELEASES}">релизҳо</a>-ро бинед.</p>
+  <script>document.querySelectorAll('[data-platforms] .platform-toggle').forEach(button => button.addEventListener('click', () => {{ const selected = button.closest('.platform'); document.querySelectorAll('[data-platforms] .platform').forEach(item => {{ const active = item === selected; item.classList.toggle('active', active); item.querySelector('.platform-toggle').setAttribute('aria-expanded', active); }}); }}));</script>
 </header>
 
 <section style="border-top:0; padding-top:0">
