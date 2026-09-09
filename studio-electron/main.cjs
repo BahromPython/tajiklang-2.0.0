@@ -5,6 +5,8 @@ const path = require("node:path");
 
 let window;
 const PROJECT_FILE_LIMIT = 180;
+const NEW_PROGRAM = "# TajikLang Next\nдода ном <- \"Баҳром\"\n\nнишон \"Салом\", ном\n";
+const SMOKE_TEST = process.env.TAJIKLANG_SMOKE === "1";
 
 function sendMenuAction(action) {
   if (window && !window.isDestroyed()) window.webContents.send("studio:menu", action);
@@ -66,12 +68,20 @@ async function openFromSystem(filePath) {
 function createWindow() {
   window = new BrowserWindow({
     width: 1440, height: 900, minWidth: 960, minHeight: 650,
-    backgroundColor: "#11131a", autoHideMenuBar: false,
+    backgroundColor: "#11131a", autoHideMenuBar: false, show: !SMOKE_TEST,
     title: "TajikLang Studio",
     webPreferences: { preload: path.join(__dirname, "preload.cjs"), contextIsolation: true, nodeIntegration: false }
   });
   window.loadFile(path.join(__dirname, "src", "index.html"));
-  window.webContents.once("did-finish-load", () => openFromSystem(fileArgument(process.argv)));
+  window.webContents.once("did-finish-load", async () => {
+    await openFromSystem(fileArgument(process.argv));
+    if (SMOKE_TEST) await runSmokeTest();
+  });
+}
+
+async function writeNewProgram(filePath) {
+  await fs.writeFile(filePath, NEW_PROGRAM, "utf8");
+  return { path: filePath, name: path.basename(filePath), source: NEW_PROGRAM };
 }
 
 function runtime() {
@@ -111,6 +121,38 @@ function execute(source, currentPath, mode = "run") {
   });
 }
 
+const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+async function runSmokeTest() {
+  try {
+    const labels = Menu.getApplicationMenu().items.map(item => item.label);
+    for (const label of ["Файл", "Таҳрир", "Намоиш", "Иҷро", "Терминал", "Кумак"]) {
+      if (!labels.includes(label)) throw new Error(`Menu missing: ${label}`);
+    }
+    const page = await window.webContents.executeJavaScript(
+      "Boolean(window.studio && document.querySelector('#new-file') && document.querySelector('#terminal-panel'))"
+    );
+    if (!page) throw new Error("Studio UI or preload bridge missing.");
+    const saved = await writeNewProgram(path.join(app.getPath("temp"), "tajiklang-smoke.tj"));
+    if (!saved.source.includes("дода ном")) throw new Error("New file template failed.");
+    const ran = await execute(NEW_PROGRAM, null);
+    if (!ran.ok || !ran.output.includes("Салом Баҳром")) throw new Error("Run command failed.");
+    const terminal = await runRuntime(["--version"], app.getPath("temp"));
+    if (!terminal.ok || !terminal.output.includes("TajikLang")) throw new Error("Terminal runner failed.");
+    sendMenuAction("terminal");
+    await wait(80);
+    const terminalVisible = await window.webContents.executeJavaScript(
+      "!document.querySelector('#terminal-panel').hidden"
+    );
+    if (!terminalVisible) throw new Error("Terminal menu shortcut bridge failed.");
+    await fs.unlink(saved.path).catch(() => {});
+    console.log("TajikLang Studio smoke test passed.");
+    app.exit(0);
+  } catch (error) {
+    console.error(`TajikLang Studio smoke test failed: ${error.stack || error}`);
+    app.exit(1);
+  }
+}
+
 async function projectFiles(folder, prefix = "", state = { count: 0, depth: 0 }) {
   if (state.depth > 5 || state.count >= PROJECT_FILE_LIMIT) return [];
   const entries = await fs.readdir(folder, { withFileTypes: true });
@@ -140,6 +182,14 @@ app.whenReady().then(() => {
     if (result.canceled) return null;
     const filePath = result.filePaths[0];
     return { path: filePath, name: path.basename(filePath), source: await fs.readFile(filePath, "utf8") };
+  });
+  ipcMain.handle("file:new", async () => {
+    const result = await dialog.showSaveDialog(window, {
+      defaultPath: "барномаи нав.tj",
+      filters: [{ name: "TajikLang", extensions: ["tj"] }]
+    });
+    if (result.canceled) return null;
+    return writeNewProgram(result.filePath);
   });
   ipcMain.handle("project:open", async () => {
     const result = await dialog.showOpenDialog(window, { properties: ["openDirectory"] });

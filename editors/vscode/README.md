@@ -17,7 +17,7 @@
 
 ## Насб
 
-1. Файли `tajiklang-3.0.3.vsix`-ро аз саҳифаи
+1. Файли `tajiklang-3.0.4.vsix`-ро аз саҳифаи
    [TajikLang Releases](https://github.com/BahromPython/tajiklang-2.0.0/releases)
    гиред.
 2. Дар VS Code ба **Extensions** гузаред.
@@ -27,7 +27,7 @@
 Ё аз терминал:
 
 ```text
-code --install-extension tajiklang-3.0.3.vsix
+code --install-extension tajiklang-3.0.4.vsix
 ```
 
 ## Барномаи намунавӣ

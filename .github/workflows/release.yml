@@ -34,6 +34,11 @@ jobs:
           node-version: 22
       - working-directory: studio-electron
         run: npm install
+      - shell: pwsh
+        working-directory: studio-electron
+        run: |
+          $env:TAJIKLANG_SMOKE = "1"
+          npx electron .
       - working-directory: studio-electron
         run: npx electron-builder --win nsis --${{ matrix.label == 'x86' && 'ia32' || 'x64' }}
       - shell: pwsh

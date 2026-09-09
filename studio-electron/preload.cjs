@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("studio", {
   open: () => ipcRenderer.invoke("file:open"),
+  newFile: () => ipcRenderer.invoke("file:new"),
   openProject: () => ipcRenderer.invoke("project:open"),
   readFile: path => ipcRenderer.invoke("file:read", path),
   save: value => ipcRenderer.invoke("file:save", value),
