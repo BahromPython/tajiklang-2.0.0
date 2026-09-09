@@ -28,6 +28,10 @@ REPO = "https://github.com/BahromPython/tajiklang-2.0.0"
 # x64 installer, which is the right choice for nearly every student.
 DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-Studio-Setup-Windows-x64.exe"
 RELEASES = f"{REPO}/releases/latest"
+V2_RELEASE = f"{REPO}/releases/tag/v2.2.2"
+V2_WINDOWS = f"{REPO}/releases/download/v2.2.2/TajikLang-Studio-Setup-Windows-x64.exe"
+V2_MAC = f"{REPO}/releases/download/v2.2.2/TajikLang-Studio-macos-arm64.dmg"
+V2_LINUX = f"{REPO}/releases/download/v2.2.2/TajikLang-Studio-linux-x86_64.AppImage"
 MAC_INTEL = f"{REPO}/releases/latest/download/TajikLang-Studio-macos-x86_64.dmg"
 MAC_APPLE = f"{REPO}/releases/latest/download/TajikLang-Studio-macos-arm64.dmg"
 LINUX = f"{REPO}/releases/latest/download/TajikLang-Studio-linux-x86_64.AppImage"
@@ -205,6 +209,10 @@ STYLE = """
   .platform-inner > div { padding: 0 4px 22px; color: var(--soft); }
   .platform-inner p { margin: 0 0 14px; }
   .platform-inner .cta { margin: 0; }
+  .legacy-release { margin-top: 22px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--panel) 86%, var(--bg)); }
+  .legacy-release h3 { margin: 0 0 5px; font-size: 16px; }
+  .legacy-release p { margin: 0 0 12px; color: var(--soft); font-size: 14px; }
+  .legacy-release .cta { margin: 0; }
 
   .steps { counter-reset: s; padding: 0; list-style: none; }
   .steps li { counter-increment: s; position: relative; padding-right: 42px; margin-bottom: 22px; }
@@ -495,6 +503,11 @@ def install_page(f: dict[str, str]) -> str:
       </div></div></div>
     </article>
   </div>
+  <aside class="legacy-release" aria-label="TajikLang 2 downloads">
+    <h3>TajikLang 2 · нусхаи пешина</h3>
+    <p>Агар ба шумо маҳз муҳити версияи 2 лозим бошад, он ҳамеша дастрас мемонад.</p>
+    <div class="cta"><a class="btn" href="{V2_WINDOWS}">Windows x64</a><a class="btn" href="{V2_MAC}">macOS</a><a class="btn" href="{V2_LINUX}">Linux</a><a class="btn" href="{V2_RELEASE}">Ҳамаи файлҳои v2</a></div>
+  </aside>
   <p class="quiet">Барои ҳамаи нусхаҳо саҳифаи <a href="{RELEASES}">релизҳо</a>-ро бинед.</p>
   <script>document.querySelectorAll('[data-platforms] .platform-toggle').forEach(button => button.addEventListener('click', () => {{ const selected = button.closest('.platform'); document.querySelectorAll('[data-platforms] .platform').forEach(item => {{ const active = item === selected; item.classList.toggle('active', active); item.querySelector('.platform-toggle').setAttribute('aria-expanded', active); }}); }}));</script>
 </header>
