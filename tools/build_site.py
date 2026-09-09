@@ -28,6 +28,9 @@ REPO = "https://github.com/BahromPython/tajiklang-2.0.0"
 # x64 installer, which is the right choice for nearly every student.
 DOWNLOAD = f"{REPO}/releases/latest/download/TajikLang-Setup-Windows-x64.exe"
 RELEASES = f"{REPO}/releases/latest"
+MAC_INTEL = f"{REPO}/releases/latest/download/TajikLang-macos-x86_64.pkg"
+MAC_APPLE = f"{REPO}/releases/latest/download/TajikLang-macos-arm64.pkg"
+LINUX = f"{REPO}/releases/latest/download/TajikLang-linux-x86_64.tar.gz"
 
 sys.path.insert(0, str(ROOT))
 
@@ -468,6 +471,13 @@ def install_page(f: dict[str, str]) -> str:
       <span class="pill">Версияи {f['version']}</span>
     </div>
   </div>
+
+  <div class="cards" style="margin-top:18px">
+    <div class="card"><h3>macOS — Intel</h3><p>Барои Mac-ҳои Intel. Насбкунандаи <code>.pkg</code>.</p><p><a href="{MAC_INTEL}">⬇ Зеркашӣ барои Mac Intel</a></p></div>
+    <div class="card"><h3>macOS — Apple Silicon</h3><p>Барои MacBook-ҳои M1, M2, M3 ва M4. Насбкунандаи <code>.pkg</code>.</p><p><a href="{MAC_APPLE}">⬇ Зеркашӣ барои Apple Silicon</a></p></div>
+    <div class="card"><h3>Linux — 64-bit</h3><p>Барои Ubuntu, Debian, Fedora ва дигар Linux-ҳои 64-bit. Бастаи <code>.tar.gz</code>.</p><p><a href="{LINUX}">⬇ Зеркашӣ барои Linux</a></p></div>
+  </div>
+  <p class="quiet">Linux аз нашри навбатии 2.1.4 дастрас мешавад. Барои ҳамаи нусхаҳо саҳифаи <a href="{RELEASES}">релизҳо</a>-ро бинед.</p>
 </header>
 
 <section style="border-top:0; padding-top:0">

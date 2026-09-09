@@ -121,62 +121,81 @@ class IDE:
         style = ttk.Style(self.root)
         style.theme_use("clam")
         style.configure("TNotebook", background=THEME["panel"], borderwidth=0)
-        style.configure(
-            "TNotebook.Tab", background=THEME["panel"], foreground=THEME["soft"],
-            padding=(14, 9), font=("Segoe UI", 9, "bold"), borderwidth=0,
-        )
+        style.configure("TNotebook.Tab", background=THEME["panel"], foreground=THEME["soft"],
+                        padding=(14, 7), font=("Segoe UI", 9), borderwidth=0)
         style.map("TNotebook.Tab", background=[("selected", THEME["bg"])],
                   foreground=[("selected", THEME["ink"])])
 
-        header = tk.Frame(self.root, bg=THEME["panel"], padx=18, pady=12)
-        header.pack(fill="x")
-        mark = tk.Label(header, text="Т", font=("Segoe UI", 18, "bold"),
-                        width=3, bg=THEME["accent"], fg="#06241c", pady=3)
-        mark.pack(side="left", padx=(0, 10))
-        brand = tk.Frame(header, bg=THEME["panel"])
-        brand.pack(side="left", padx=(0, 28))
-        tk.Label(brand, text="TajikLang Studio", font=("Segoe UI", 13, "bold"),
-                 bg=THEME["panel"], fg=THEME["ink"]).pack(anchor="w")
-        tk.Label(brand, text="Муҳаррири барномасозии тоҷикӣ", font=("Segoe UI", 8),
-                 bg=THEME["panel"], fg=THEME["soft"]).pack(anchor="w")
+        # A familiar professional workbench: command bar, activity rail,
+        # Explorer, editor tab/breadcrumb, bottom panel and status bar.
+        command_bar = tk.Frame(self.root, bg="#101828", height=38)
+        command_bar.pack(fill="x")
+        command_bar.pack_propagate(False)
+        tk.Label(command_bar, text="Т", font=("Segoe UI", 13, "bold"), width=3,
+                 bg="#101828", fg=THEME["accent"]).pack(side="left")
+        tk.Label(command_bar, text="TajikLang Studio", font=("Segoe UI", 9, "bold"),
+                 bg="#101828", fg=THEME["ink"]).pack(side="left", padx=(3, 28))
+        search = tk.Entry(command_bar, font=("Segoe UI", 9), relief="flat",
+                          bg="#1b2940", fg=THEME["soft"], insertbackground=THEME["ink"])
+        search.insert(0, "Ҷустуҷӯ дар лоиҳа")
+        search.pack(side="left", fill="x", expand=True, padx=(0, 28), pady=7, ipady=2)
+        tk.Label(command_bar, text="◌  ◫  □", font=("Segoe UI", 10), bg="#101828",
+                 fg=THEME["soft"]).pack(side="right", padx=14)
 
-        actions = tk.Frame(header, bg=THEME["panel"])
-        actions.pack(side="left")
-        self._button(actions, "▶ Иҷро", self.run, primary=True)
-        self._button(actions, "✓ Санҷиш", self.check)
-        self._button(actions, "Нав", self._new)
-        self._button(actions, "Кушодан", self.open_dialog)
-        self._button(actions, "Нигоҳ доштан", self.save)
-
-        tools = tk.Frame(self.root, bg=THEME["panel_raised"], padx=18, pady=7)
-        tools.pack(fill="x")
-        for label, command in (("◈ TajikBlocks", self.open_blocks),
-                               ("◉ Пешнамоиши сомона", self.preview_website),
-                               ("◫ Бастаҳо", self.show_packages)):
-            tk.Button(tools, text=label, command=command, font=ui, relief="flat",
-                      bg=THEME["panel_raised"], fg=THEME["soft"],
-                      activebackground=THEME["line"], activeforeground=THEME["ink"],
-                      padx=9, pady=2, cursor="hand2", borderwidth=0).pack(side="left")
-
-        self.status = tk.Label(
-            tools, text="Омода", font=ui, bg=THEME["panel_raised"], fg=THEME["soft"], padx=12
-        )
-        self.status.pack(side="right")
-
-        body = tk.PanedWindow(
-            self.root, orient="horizontal", bg=THEME["line"], sashwidth=4,
-            borderwidth=0,
-        )
+        body = tk.Frame(self.root, bg=THEME["line"])
         body.pack(fill="both", expand=True)
 
-        # --- editor + panels -------------------------------------------
-        left = tk.PanedWindow(
-            body, orient="vertical", bg=THEME["line"], sashwidth=4, borderwidth=0
-        )
-        body.add(left, stretch="always", width=860)
+        activity = tk.Frame(body, bg="#101828", width=48)
+        activity.pack(side="left", fill="y")
+        activity.pack_propagate(False)
+        for label, command in (("▤", self._refresh_files), ("⌕", self.open_dialog),
+                               ("⑂", self.show_packages), ("▷", self.run),
+                               ("▧", self.open_blocks)):
+            tk.Button(activity, text=label, command=command, font=("Segoe UI Symbol", 18),
+                      relief="flat", bg="#101828", fg=THEME["soft"],
+                      activebackground="#1b2940", activeforeground=THEME["accent"],
+                      borderwidth=0, cursor="hand2", pady=10).pack(fill="x")
+        tk.Label(activity, text="⚙", font=("Segoe UI Symbol", 16), bg="#101828",
+                 fg=THEME["soft"]).pack(side="bottom", pady=10)
 
-        editor_frame = tk.Frame(left, bg=THEME["bg"])
-        left.add(editor_frame, stretch="always", height=460)
+        files_frame = tk.Frame(body, bg=THEME["panel"], width=250)
+        files_frame.pack(side="left", fill="y")
+        files_frame.pack_propagate(False)
+        explorer_header = tk.Frame(files_frame, bg=THEME["panel"])
+        explorer_header.pack(fill="x", pady=(10, 4))
+        tk.Label(explorer_header, text="ФАЙЛҲО", anchor="w", font=("Segoe UI", 9, "bold"),
+                 bg=THEME["panel"], fg=THEME["soft"]).pack(side="left", padx=14)
+        tk.Button(explorer_header, text="＋", command=self._new, relief="flat", bg=THEME["panel"],
+                  fg=THEME["soft"], activebackground=THEME["line"], borderwidth=0).pack(side="right", padx=8)
+        tk.Label(files_frame, text="⌄  ЛОИҲАИ КУШОДА", anchor="w", font=("Segoe UI", 9, "bold"),
+                 bg=THEME["panel"], fg=THEME["ink"], pady=7).pack(fill="x", padx=9)
+        self.file_list = tk.Listbox(files_frame, borderwidth=0, font=mono, activestyle="none",
+                                    background=THEME["panel"], foreground=THEME["ink"],
+                                    selectbackground="#214a59", selectforeground=THEME["ink"],
+                                    highlightthickness=0)
+        self.file_list.pack(fill="both", expand=True)
+        self.file_list.bind("<Double-Button-1>", self._open_selected)
+        self.file_list.bind("<Return>", self._open_selected)
+
+        # --- editor + panels -------------------------------------------
+        left = tk.PanedWindow(body, orient="vertical", bg=THEME["line"], sashwidth=4, borderwidth=0)
+        left.pack(side="left", fill="both", expand=True)
+        editor_shell = tk.Frame(left, bg=THEME["bg"])
+        left.add(editor_shell, stretch="always", height=460)
+        tabs = tk.Frame(editor_shell, bg=THEME["panel"], height=36)
+        tabs.pack(fill="x")
+        tabs.pack_propagate(False)
+        tk.Label(tabs, text="  ◆  барномаи нав.tj    ×", font=("Segoe UI", 9),
+                 bg=THEME["bg"], fg=THEME["ink"], padx=12, pady=9).pack(side="left")
+        actions = tk.Frame(tabs, bg=THEME["panel"])
+        actions.pack(side="right", padx=7, pady=4)
+        self._button(actions, "▶ Иҷро", self.run, primary=True)
+        self._button(actions, "✓ Санҷиш", self.check)
+        breadcrumb = tk.Label(editor_shell, text="  ЛОИҲА  ›  мисолҳо  ›  барномаи нав.tj",
+                              anchor="w", font=("Segoe UI", 8), bg=THEME["bg"], fg=THEME["soft"], pady=5)
+        breadcrumb.pack(fill="x")
+        editor_frame = tk.Frame(editor_shell, bg=THEME["bg"])
+        editor_frame.pack(fill="both", expand=True)
 
         self.gutter = tk.Text(
             editor_frame, width=5, padx=8, takefocus=0, borderwidth=0,
@@ -224,24 +243,14 @@ class IDE:
         self.panels = panels
         self.problems_tab = 2
 
-        # --- file list --------------------------------------------------
-        files_frame = tk.Frame(body, bg=THEME["panel"])
-        body.add(files_frame, width=250)
-
-        tk.Label(
-            files_frame, text="  ФАЙЛҲОИ ЛОИҲА", anchor="w", font=("Segoe UI", 9, "bold"),
-            bg=THEME["panel"], fg=THEME["soft"], pady=12,
-        ).pack(fill="x")
-
-        self.file_list = tk.Listbox(
-            files_frame, borderwidth=0, font=mono, activestyle="none",
-            background=THEME["panel"], foreground=THEME["ink"],
-            selectbackground=THEME["line"], selectforeground=THEME["ink"],
-            highlightthickness=0,
-        )
-        self.file_list.pack(fill="both", expand=True)
-        self.file_list.bind("<Double-Button-1>", self._open_selected)
-        self.file_list.bind("<Return>", self._open_selected)
+        status_bar = tk.Frame(self.root, bg="#0d8270", height=23)
+        status_bar.pack(fill="x")
+        status_bar.pack_propagate(False)
+        self.status = tk.Label(status_bar, text="✓ Омода", font=("Segoe UI", 8),
+                               bg="#0d8270", fg="#e8fffb", padx=9)
+        self.status.pack(side="left")
+        tk.Label(status_bar, text="TajikLang   UTF-8   .tj", font=("Segoe UI", 8),
+                 bg="#0d8270", fg="#e8fffb", padx=9).pack(side="right")
 
     def _make_text(self, parent, colour: str, editable: bool = False) -> "tk.Text":
         frame = tk.Frame(parent, bg=THEME["bg"])

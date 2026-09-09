@@ -55,12 +55,27 @@ def main() -> int:
         return 1
 
     (DIST / "tajik").rename(package)
+
+    # The Studio build is a real .app bundle, so students open it from Finder
+    # like any other macOS application rather than through Terminal.
+    studio_dist = BUILD / "studio-dist"
+    studio_command = list(command)
+    studio_command[studio_command.index("--name") + 1] = "TajikLang Studio"
+    studio_command[studio_command.index("--distpath") + 1] = str(studio_dist)
+    studio_command[studio_command.index("--workpath") + 1] = str(BUILD / "studio-work")
+    studio_command[studio_command.index("--specpath") + 1] = str(BUILD / "studio-spec")
+    studio_command[studio_command.index("--console")] = "--windowed"
+    studio_command[-1] = str(ROOT / "tajiklang" / "desktop.py")
+    if subprocess.run(studio_command, cwd=ROOT).returncode:
+        return 1
+    shutil.copytree(studio_dist / "TajikLang Studio.app", package / "TajikLang Studio.app")
     shutil.copytree(ROOT / "examples", package / "мисолҳо")
     shutil.copy(ROOT / "docs" / "дарсҳо.md", package / "дарсҳо.md")
     shutil.copy(ROOT / "LICENSE", package / "LICENSE")
     (package / "ХОНЕД.txt").write_text(
         "TajikLang барои macOS\n\n"
-        "Барои иҷро аз Terminal:\n    ./tajik барнома.tj\n\n"
+        "Барои кушодан: TajikLang Studio.app-ро ду клик кунед.\n\n"
+        "Барои иҷро аз Terminal:\n    ./tajik/tajik барнома.tj\n\n"
         "Ин нусха то имзои расмии Apple unsigned аст.\n",
         encoding="utf-8",
     )
