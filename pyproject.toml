@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tajiklang"
-version = "2.2.0"
+version = "2.2.1"
 description = "Забони барномасозӣ бо забони тоҷикӣ — a programming language with Tajik keywords, for Tajik-speaking students"
 readme = "README.md"
 requires-python = ">=3.10"

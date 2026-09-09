@@ -1,6 +1,6 @@
 {
   "name": "tajiklang-studio",
-  "version": "0.1.0",
+  "version": "2.2.1",
   "private": true,
   "description": "TajikLang Studio — Electron workbench",
   "main": "main.cjs",
@@ -18,7 +18,7 @@
     "directories": { "output": "release" },
     "files": ["**/*", "!release"],
     "extraResources": [{ "from": "../dist/TajikLang", "to": "runtime", "filter": ["**/*"] }],
-    "win": { "target": "nsis", "icon": "../build/tajiklang-studio.ico" },
+    "win": { "target": "nsis", "icon": "assets/tajiklang.ico" },
     "mac": { "target": "dmg" },
     "linux": { "target": "AppImage" }
   }
