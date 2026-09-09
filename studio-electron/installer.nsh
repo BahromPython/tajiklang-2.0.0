@@ -15,6 +15,8 @@
   WriteRegStr HKCU "Software\Classes\TajikLang.Program" "FriendlyTypeName" "Барномаи TajikLang (.tj)"
   WriteRegStr HKCU "Software\Classes\TajikLang.Program\DefaultIcon" "" "$INSTDIR\TajikLang Studio.exe,0"
   WriteRegStr HKCU "Software\Classes\TajikLang.Program\shell\open\command" "" '"$INSTDIR\TajikLang Studio.exe" "%1"'
+  WriteRegStr HKCU "Software\Classes\TajikLang.Program\shell\run" "" "Иҷро дар терминали TajikLang"
+  WriteRegStr HKCU "Software\Classes\TajikLang.Program\shell\run\command" "" '"$SYSDIR\cmd.exe" /d /k ""$INSTDIR\tajik.cmd" "%1""'
 
   ; A visible command wrapper means `tajik` works in both Command Prompt and
   ; PowerShell, without students finding the private resources/runtime folder.

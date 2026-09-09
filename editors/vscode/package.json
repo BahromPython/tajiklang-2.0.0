@@ -1,9 +1,13 @@
 {
   "name": "tajiklang",
   "displayName": "TajikLang",
-  "description": "Забони барномасозӣ бо забони тоҷикӣ — syntax highlighting for .tj files",
-  "version": "3.0.2",
+  "description": "TajikLang барои VS Code: Tajik syntax, TajikLang Next, brackets and comments for .tj files.",
+  "version": "3.0.3",
   "publisher": "tajiklang",
+  "icon": "assets/tajiklang.png",
+  "homepage": "https://tajiklang.netlify.app",
+  "repository": { "type": "git", "url": "https://github.com/BahromPython/tajiklang-2.0.0.git" },
+  "keywords": ["tajiklang", "tajik", "tojik", "programming language", "tj"],
   "license": "MIT",
   "engines": {
     "vscode": "^1.75.0"
